@@ -1,1 +1,3 @@
-Hi this is a testingasd asd asd as asd a
+# POS System
+
+Point of sale system. Work in progress.
