@@ -1,1 +1,3 @@
-Hi this is a testing
+# POS System
+
+Point of sale system. Work in progress.
