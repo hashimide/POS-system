@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shopify × OTTO — the plan in plain words</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0d1117; --surface:#161b22; --raised:#1c2128; --line:#30363d;
+  --ink:#f0f6fc; --body:#c9d1d9; --dim:#b3bcc6; --mute:#7d8590;
+  --accent:#6e7bf2; --link:#8b9bf5;
+  --ok-bg:#12331d; --ok-fg:#4ac26b;
+  --warn-bg:#2b2113; --warn-fg:#e3b341;
+  --bad-bg:#2d1618; --bad-fg:#f85149;
+  --info-bg:#1b1f3b; --info-fg:#a5b0ff;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--body);font:15px/1.65 var(--f-body);margin:0}
+.wrap{max-width:920px;margin:0 auto;padding:40px max(16px,env(safe-area-inset-right,0px)) 96px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:52px}
+header{display:flex;flex-direction:column;gap:14px}
+.eyebrow{font:500 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+h1{font:700 clamp(30px,5vw,42px)/1.12 var(--f-display);color:var(--ink);margin:0;text-wrap:balance}
+h2{font:600 clamp(21px,3vw,25px)/1.2 var(--f-display);color:var(--ink);margin:0;text-wrap:balance}
+h3{font:600 16px/1.3 var(--f-body);color:var(--ink);margin:0}
+p{margin:0;max-width:74ch}
+a{color:var(--link)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;font:13px/1.4 var(--f-mono);color:var(--mute)}
+.meta b{color:var(--dim);font-weight:500}
+section{display:flex;flex-direction:column;gap:16px;scroll-margin-top:16px}
+section>h2{padding-top:20px;border-top:1px solid var(--line)}
+.sub{display:flex;flex-direction:column;gap:10px}
+ul,ol{margin:0;padding-left:1.25em;display:flex;flex-direction:column;gap:7px;max-width:76ch}
+li::marker{color:var(--mute)}
+code{font-family:var(--f-mono);font-size:.84em;background:var(--raised);border:1px solid var(--line);padding:.05em .35em;border-radius:4px;color:var(--ink);overflow-wrap:anywhere}
+.bluf{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.bluf ul{gap:8px}
+.toc{display:flex;flex-wrap:wrap;gap:8px}
+.toc a{font:13px/1 var(--f-body);color:var(--dim);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+.toc a:hover{color:var(--ink);border-color:var(--mute)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:600px;font-size:14px;line-height:1.5}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font:600 12px/1.3 var(--f-body);letter-spacing:.04em;text-transform:uppercase;color:var(--mute);background:var(--surface)}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-block;font:600 11px/1 var(--f-mono);letter-spacing:.05em;text-transform:uppercase;padding:5px 8px;border-radius:999px;white-space:nowrap}
+.p-bad{background:var(--bad-bg);color:var(--bad-fg)}
+.p-warn{background:var(--warn-bg);color:var(--warn-fg)}
+.p-ok{background:var(--ok-bg);color:var(--ok-fg)}
+.p-info{background:var(--info-bg);color:var(--info-fg)}
+.states{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.state{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.state .k{font:500 12px/1 var(--f-mono);color:var(--mute)}
+.state ul{font-size:14px;gap:5px}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card ul{font-size:14px}
+.card p{font-size:14px}
+.note{border-left:3px solid var(--warn-fg);background:var(--warn-bg);padding:12px 16px;border-radius:0 8px 8px 0;color:var(--body);max-width:none}
+.note.crit{border-left-color:var(--bad-fg);background:var(--bad-bg)}
+.note.good{border-left-color:var(--ok-fg);background:var(--ok-bg)}
+.phase{display:grid;grid-template-columns:130px minmax(0,1fr);gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}
+.phase:last-child{border-bottom:0}
+.phase .when{font:600 13px/1.35 var(--f-mono);color:var(--ink)}
+.phase .when span{display:block;font-weight:400;color:var(--mute);margin-top:4px}
+.phase>div{display:flex;flex-direction:column;gap:8px;min-width:0}
+.step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border-bottom:0}
+.step .n{font:600 15px/1 var(--f-mono);color:var(--accent);border:1px solid var(--line);background:var(--surface);border-radius:999px;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+.step>div{display:flex;flex-direction:column;gap:6px;min-width:0}
+.gloss dt{font:600 13px/1.4 var(--f-body);color:var(--ink);margin-top:10px}
+.gloss dd{margin:2px 0 0;padding-left:0;color:var(--body);font-size:14px}
+footer{font:13px/1.6 var(--f-mono);color:var(--mute);border-top:1px solid var(--line);padding-top:16px}
+@media (max-width:760px){
+  .states,.cols{grid-template-columns:minmax(0,1fr)}
+  .phase{grid-template-columns:minmax(0,1fr);gap:8px}
+  table{min-width:520px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <span class="eyebrow">Plain-words companion · Shopify app + Search Atlas backend + OTTO</span>
+  <h1>Connecting Shopify stores to OTTO — the whole plan, explained simply</h1>
+  <div class="meta">
+    <span><b>Date</b> 2026-11-08</span>
+    <span><b>Owner</b> Raza Imran (Shopify app)</span>
+    <span><b>Approved by</b> Lazaro Borges (OTTO PM), 2026-11-06</span>
+    <span><b>Status</b> Step 1 (security lock-downs) is next; not started yet</span>
+  </div>
+  <nav class="toc" aria-label="Sections">
+    <a href="#summary">Summary</a>
+    <a href="#words">Words used</a>
+    <a href="#goal">The goal</a>
+    <a href="#today">How it works today</a>
+    <a href="#wrong">What's wrong today</a>
+    <a href="#steps">The plan, step by step</a>
+    <a href="#handshake">How a store gets connected</a>
+    <a href="#states">The three store states</a>
+    <a href="#data">Where information lives</a>
+    <a href="#domains">Two addresses per store</a>
+    <a href="#lazaro">What Lazaro decided</a>
+    <a href="#progress">Progress so far</a>
+    <a href="#pixel">The pixel story</a>
+    <a href="#uninstall">Uninstall and clean exit</a>
+    <a href="#existing">Existing stores</a>
+    <a href="#open">Open questions</a>
+    <a href="#risks">Risks and watch-outs</a>
+    <a href="#testing">How we'll test</a>
+    <a href="#next">What's next</a>
+  </nav>
+</header>
+
+<section id="summary">
+  <h2>Summary</h2>
+  <div class="bluf">
+    <ul>
+      <li><b>Goal:</b> a merchant installs our Shopify app, approves once, and sees a <b>view-only OTTO dashboard</b> inside Shopify — the same one WordPress users get. Uninstalling cleans everything up.</li>
+      <li><b>Today the app is forgetful and unsafe:</b> it remembers nothing about the store, asks the backend "who is this store?" on every page using only the store's web address, and shows the merchant's <b>full</b> account through a 180-day login pass sitting in a web address.</li>
+      <li><b>The fix:</b> give the app a memory. One safe handshake per store, then the app keeps its own revocable key and the OTTO project ID, and never asks "who am I?" again. No login pass ever reaches the browser.</li>
+      <li><b>Order of work:</b> first close two open doors in the backend (urgent, small), then the stored connection and view-only dashboard, then finish the log-in path and the pixel, then clean up old code.</li>
+      <li><b>Lazaro (OTTO PM) approved the plan on 6 Nov:</b> one approval for the merchant, proof via Shopify's short-lived pass, OTTO receives the store's key so it can write fixes into the store, projects use the store's real domain.</li>
+      <li><b>Where we are:</b> test payments work safely, the app already remembers each store's real domain and deletes its record on uninstall. The two security lock-downs are <b>not started</b> — that's the next step.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="words">
+  <h2>Words used in this document</h2>
+  <p>Plain words for the few technical things we can't avoid naming:</p>
+  <dl class="gloss">
+    <dt>The app</dt>
+    <dd>Our Search Atlas app inside Shopify admin (the thing the merchant installs).</dd>
+    <dt>The backend</dt>
+    <dd>Search Atlas's own servers — they own accounts, plans and billing.</dd>
+    <dt>Login pass</dt>
+    <dd>A long-lived pass (180 days) that opens the merchant's whole Search Atlas account. Today it leaks into web addresses. Goal: it never leaves our server.</dd>
+    <dt>Store key</dt>
+    <dd>A per-store pass our backend can mint and revoke. The app's new way to prove who it is — like a password we can change per store.</dd>
+    <dt>Proof pass</dt>
+    <dd>A Shopify-signed pass that lives about one minute and proves "this request really came from this store". Single-use, nothing secret kept.</dd>
+    <dt>Long-lived store key</dt>
+    <dd>The master key Shopify gives our app for a store (install it once, use it forever). Great for working on the store, too precious to send around just to prove identity.</dd>
+    <dt>Handshake</dt>
+    <dd>The one-time connect step: the app proves which store it is, and receives its store key, OTTO project ID and dashboard address.</dd>
+    <dt>Real domain vs internal address</dt>
+    <dd>Shoppers see <code>yourstore.com</code> (the real domain). Shopify internally also gives every store a permanent <code>something.myshopify.com</code> address. Same store, two addresses, different jobs.</dd>
+    <dt>Public share code</dt>
+    <dd>A harmless code that unlocks the view-only OTTO page for one project. Safe to show in the browser.</dd>
+    <dt>Theme app embed</dt>
+    <dd>The modern way to add a script to a Shopify store: a block the merchant switches on once in their theme editor.</dd>
+  </dl>
+</section>
+
+<section id="goal">
+  <h2>The goal</h2>
+  <div class="cols">
+    <div class="card">
+      <h3>What success looks like</h3>
+      <ul>
+        <li>A merchant installs the app, approves once, done — no second OTTO login.</li>
+        <li>Inside Shopify they see the <b>view-only</b> OTTO dashboard. To change anything, they click "Open Search Atlas" in a new tab.</li>
+        <li>Stores that don't have an OTTO project yet get a clear, friendly screen — and the dashboard appears by itself once they create one.</li>
+        <li>Uninstall revokes everything and leaves nothing behind.</li>
+        <li>Stores already connected move to the new system by themselves — no merchant action.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>What we are deliberately NOT building</h3>
+      <ul>
+        <li>No rebuild of billing or the plans page.</li>
+        <li>No automatic OTTO project creation for log-in stores (it spends the merchant's paid quota and we might pick the wrong domain).</li>
+        <li>No interactive dashboard inside Shopify — looking only.</li>
+        <li>The pixel / theme app embed is agreed as a later topic, not now.</li>
+        <li>Shopify's big key deadline (Jan 2027) is tracked as its own separate work item.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="today">
+  <h2>How the app works today</h2>
+
+  <div class="sub">
+    <h3>Every single page load</h3>
+    <ol>
+      <li>The app asks the backend "who is this store?" — sending only the store's web address.</li>
+      <li>The backend answers with a brand-new 180-day login pass and a dashboard address.</li>
+      <li>The app opens that address inside Shopify — putting the login pass right into the web address of the page.</li>
+    </ol>
+    <p>So the app has no memory, every page costs an extra round trip, and the most powerful pass we have travels through the browser on every load.</p>
+  </div>
+
+  <div class="sub">
+    <h3>Two ways a store gets connected</h3>
+    <div class="cols">
+      <div class="card">
+        <h3>Way 1 — the merchant subscribes</h3>
+        <ul>
+          <li>They pick a plan in the app and approve the payment in Shopify.</li>
+          <li>The backend creates their Search Atlas account, the subscription, and an OTTO project.</li>
+          <li>…but the new project's ID is thrown away, and the project is set up for the wrong address (the internal one, not the real domain).</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Way 2 — the merchant logs in</h3>
+        <ul>
+          <li>They log in with an existing Search Atlas account.</li>
+          <li>The store gets linked to that account — and that's all.</li>
+          <li>No OTTO project, no pixel, no store details saved. OTTO never runs for them, even if they later create a project themselves.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub">
+    <h3>The tracking pixel</h3>
+    <p>OTTO's pixel is added to the storefront using an old script-planting method that Shopify rejects since 1 October 2026. New stores get no pixel at all, and existing planted scripts stop working entirely on 1 March 2027. The replacement is a theme app embed the merchant switches on once.</p>
+  </div>
+
+  <div class="sub">
+    <h3>For comparison: how WordPress does it</h3>
+    <p>The WordPress plugin already works the way we want: it stores an encrypted per-site key and the OTTO project ID, trades the key for a short-lived pass on the server (the browser never sees it), and shows the public view-only dashboard page. We are bringing Shopify up to the same design.</p>
+  </div>
+</section>
+
+<section id="wrong">
+  <h2>What's wrong today</h2>
+  <p>Everything found while studying the current app and backend, worst first.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Severity</th><th>What's wrong</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill p-bad">Critical</span></td><td>The backend answers "who is this store?" to <b>anyone who knows the store's web address</b>. No real proof is checked.</td><td>Anyone who learns a linked store's address gets a 180-day login pass to the merchant's <b>whole</b> Search Atlas account. The only brake is 20 questions per minute per visitor.</td></tr>
+      <tr><td><span class="pill p-bad">Critical</span></td><td>Whatever pass a caller sends along gets <b>saved</b> as the store's real key.</td><td>A nonsense key breaks the daily billing check — and when that check fails, it <b>auto-cancels the paying merchant's subscription</b>.</td></tr>
+      <tr><td><span class="pill p-bad">High</span></td><td>The log-in flow links any store to any account without checking the key belongs to that store.</td><td>Someone can claim a store's address before its real owner installs the app. The owner then lands inside the stranger's account.</td></tr>
+      <tr><td><span class="pill p-bad">High</span></td><td>The 180-day login pass travels inside the dashboard's web address.</td><td>It ends up in browser history, network logs, analytics and referrer headers — everywhere a web address goes.</td></tr>
+      <tr><td><span class="pill p-warn">High</span></td><td>The dashboard inside Shopify is the merchant's <b>full</b> account.</td><td>Merchants can change anything from inside Shopify. Not what we want to offer.</td></tr>
+      <tr><td><span class="pill p-warn">High</span></td><td>Log-in stores never get their store details saved and never get the pixel.</td><td>OTTO never runs on their storefront, even after they create a project.</td></tr>
+      <tr><td><span class="pill p-warn">Medium</span></td><td>When a merchant pays, the new project's ID is thrown away; no check for an existing project; failures go unnoticed.</td><td>We can't show the right dashboard later, and a broken setup is silent.</td></tr>
+      <tr><td><span class="pill p-warn">Medium</span></td><td>Projects are created and searched using the store's internal address, not its real domain — with loose matching.</td><td>OTTO works on the wrong site, the wrong project can match, and a store can load several pixels at once.</td></tr>
+      <tr><td><span class="pill p-warn">Medium</span></td><td>After payment, the backend still tries the old pixel method Shopify rejected in October.</td><td>New paying stores get no pixel; if it errors out, the merchant who <b>just paid</b> sees an error page.</td></tr>
+      <tr><td><span class="pill p-warn">Medium</span></td><td>The cancel-plan screen shows "failed to unsubscribe" even when the cancellation worked.</td><td>Confusing for merchants; support tickets for something that actually succeeded.</td></tr>
+      <tr><td><span class="pill p-warn">Medium</span></td><td>The backend's check that Shopify's event notifications are genuine is broken, so genuine notifications are rejected.</td><td>Cancellations made inside Shopify only reach us through the daily billing check — late and blunt.</td></tr>
+      <tr><td><span class="pill p-info">Low</span></td><td>A backend round trip on every page load, plus dead code and store details that get dropped along the way.</td><td>Slower pages and confusing code.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note crit"><b>Act on the two critical rows now.</b> They are small to fix, urgent, and independent of everything else in this plan. That fix is Step 1 below — and nothing has been built for it yet.</p>
+</section>
+
+<section id="steps">
+  <h2>The plan, step by step</h2>
+  <p>Four steps, each shippable on its own. App-side and backend-side work inside a step can be built at the same time; the app side is only <b>switched on</b> after the backend side is live.</p>
+
+  <div>
+    <div class="phase">
+      <div class="when">Step 1<span>Close the open doors — now</span></div>
+      <div>
+        <p><b>Backend:</b> start checking that the caller really is the store before answering the "who is this store?" question, and stop saving passes that strangers send. <b>App:</b> stop putting the store's key into web addresses (already written, waiting for release).</p>
+        <p><b>Done when:</b> a wrong or missing key for a linked store gets rejected and nothing changes in the database — while the real app keeps working for real merchants.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="when">Step 2<span>Stored connection + view-only dashboard</span></div>
+      <div>
+        <p><b>Backend:</b> the handshake endpoint, room on the store's account for the project ID and real domain, and a disconnect endpoint. <b>App:</b> the new database columns, the encryption helper, the connection module, the three-state screens, the view-only dashboard, and key revocation on uninstall.</p>
+        <p><b>Done when:</b> a linked store with a project sees the public dashboard; no login pass appears anywhere the browser can see; the second page load makes no identity call to the backend; uninstall revokes the key.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="when">Step 3<span>Log-in stores complete, payment path fixed</span></div>
+      <div>
+        <p><b>Backend:</b> save real store details for log-ins; the pixel loads exactly one project, by ID; new paying stores get one project for their <b>real</b> domain with the ID saved on both sides; fix the notification-genuineness check before relying on it more. <b>App:</b> the full "create your project" screen with automatic pick-up, and the pixel theme app embed.</p>
+        <p><b>Done when:</b> a log-in store that creates its project sees the dashboard after "Check again" — no second login — and its storefront loads exactly one pixel through the activated embed. Old log-in stores get their missing store details filled in by a one-time backfill.</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="when">Step 4<span>Clean-up</span></div>
+      <div>
+        <p><b>Backend:</b> stop returning login passes and dashboard addresses to the app entirely. <b>App:</b> delete the dead code.</p>
+        <p><b>Done when:</b> no answer from the backend to the app contains a login pass, and the old paths are gone.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="handshake">
+  <h2>How a store gets connected (the handshake)</h2>
+  <p>One safe exchange covers every situation: new installs, merchants who pay, merchants who log in, and stores that were connected before this work.</p>
+  <div>
+    <div class="step"><div class="n">1</div><div><b>The merchant approves once.</b> Our app's own Shopify approval screen asks for read/write products, read/write content and read themes. There is no separate OTTO approval — Lazaro confirmed OTTO rides on ours.</div></div>
+    <div class="step"><div class="n">2</div><div><b>The app proves which store it is.</b> It sends Shopify's short-lived proof pass (lives about a minute, signed with our app's own secret — which the backend already holds). The long-lived master key is <b>not</b> sent just to prove identity — Lazaro's explicit decision.</div></div>
+    <div class="step"><div class="n">3</div><div><b>The backend hands over the credentials.</b> It finds the store's Search Atlas account, makes a fresh revocable store key named for that store, and returns: the key, the OTTO project ID (if one exists), the project's domain, and the right dashboard address (works for whitelabel brands too). If the store isn't linked to any account, it says so.</div></div>
+    <div class="step"><div class="n">4</div><div><b>OTTO gets its own access.</b> In the same step, the store's long-lived key is handed to OTTO's <b>Connector Gateway</b> — OTTO's existing door into every other system (WordPress included) — so OTTO can write fixes into the store. The exact details still need to be agreed with <b>Arslan Abbas</b>.</div></div>
+    <div class="step"><div class="n">5</div><div><b>The app saves its one row</b> for the store: the key (encrypted), the project ID, the real domain. From then on it identifies itself with the key and never asks "who is this store?" again.</div></div>
+  </div>
+  <p class="note"><b>One side effect to agree on:</b> minting the new store key switches off the merchant's oldest-style API key, which they might use in other tools. The WordPress connect flow already behaves this way. Product/backend needs to confirm that's acceptable.</p>
+</section>
+
+<section id="states">
+  <h2>The three store states</h2>
+  <p>After the handshake, the app decides what to show from its own record — never by asking the backend who the store is.</p>
+  <div class="states">
+    <div class="state">
+      <span class="k">no record yet</span>
+      <span class="pill p-bad" style="align-self:flex-start">Not linked</span>
+      <ul>
+        <li>Show today's connect screen: "Log in" or "Subscribe to a plan".</li>
+        <li>First, quietly try the handshake once — this picks up existing stores and payment returns with no extra clicks.</li>
+      </ul>
+    </div>
+    <div class="state">
+      <span class="k">record, no project</span>
+      <span class="pill p-warn" style="align-self:flex-start">Linked, no project</span>
+      <ul>
+        <li>A friendly notice: "Create your OTTO project for <i>yourstore.com</i> in Search Atlas."</li>
+        <li>Buttons: "Open Search Atlas" (new tab, normal sign-in) and "Check again".</li>
+        <li>Re-checks automatically, at most once a minute while the screen is open.</li>
+        <li>Several matching projects: show a picker (exact domain matches only).</li>
+      </ul>
+    </div>
+    <div class="state">
+      <span class="k">record + project</span>
+      <span class="pill p-ok" style="align-self:flex-start">Ready</span>
+      <ul>
+        <li>Show the view-only OTTO dashboard.</li>
+        <li>"Open Search Atlas" for edits, in a new tab.</li>
+        <li>Plans and billing pages keep working exactly as today.</li>
+      </ul>
+    </div>
+  </div>
+  <p><b>Why we never auto-create the project for log-in stores:</b> it spends the merchant's paid project quota, we'd have to guess the domain (usually wrongly), and many of them already have one — we'd create duplicates. WordPress works the same way: create the project first, then connect. To keep it from feeling like a dead end, the store is linked immediately and the dashboard appears by itself once the project exists.</p>
+</section>
+
+<section id="data">
+  <h2>Where each piece of information lives</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Information</th><th>Lives in</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Store key</td><td>App database, encrypted</td><td>One per store, revocable on its own. Proves who we are without the "just a domain" trick.</td></tr>
+      <tr><td>OTTO project ID</td><td>App database <b>and</b> the backend</td><td>The app needs it for the dashboard; the backend needs it so the pixel loads exactly one project.</td></tr>
+      <tr><td>Dashboard address</td><td>App database</td><td>Chosen once at connect time; respects whitelabel brands.</td></tr>
+      <tr><td>Login pass</td><td>App server memory only</td><td>Refreshed before it expires. Never in the database, a web address, a log, or the browser.</td></tr>
+      <tr><td>Public share code</td><td>App server memory, 1-hour cache</td><td>Cheap to fetch again; safe for the browser to see.</td></tr>
+      <tr><td>Plan, charges, subscription status</td><td>Backend (unchanged)</td><td>Billing stays the backend's job. Only the plans and cancel pages ask about it.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note good"><b>Nothing personal is stored.</b> The new record holds no customer data — just the store address, its key, its project ID and its real domain. It is deleted on uninstall and on Shopify's data-deletion request.</p>
+</section>
+
+<section id="domains">
+  <h2>Two addresses per store</h2>
+  <p>Every store has a permanent internal address (<code>something.myshopify.com</code>) — the right ID for talking to Shopify — and the real domain shoppers actually visit (<code>yourstore.com</code>). Today everything uses the internal one, which is why OTTO ends up working on the wrong site.</p>
+  <ul>
+    <li><b>The real domain becomes the source of truth for OTTO.</b> Lazaro confirmed: projects use the store's primary domain.</li>
+    <li><b>The app reads it once at connect time</b>, re-checks when the merchant clicks "Check again", and otherwise at most once a day. Never on every page load.</li>
+    <li><b>Development stores have no custom domain</b> — their internal address is stored as-is and everything behaves exactly like today. No errors, no empty-domain projects.</li>
+    <li><b>If the real domain changes later,</b> warn the merchant. Never create or re-point anything automatically.</li>
+    <li><b>Existing stores are untouched</b> on the backend; the app simply reads the real domain into its own record.</li>
+  </ul>
+</section>
+
+<section id="lazaro">
+  <h2>What Lazaro decided (6 November, Buzz)</h2>
+  <p>Lazaro Borges, OTTO's PM, reviewed and approved the plan in the <code>product-shopify-app</code> channel, cc'ing Arslan Abbas:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Question</th><th>Decision</th></tr></thead>
+    <tbody>
+      <tr><td>Does OTTO need its own login flow for Shopify merchants?</td><td><b>No.</b> Stores connect through our app's Shopify approval — the merchant approves once, total.</td></tr>
+      <tr><td>How does the app prove which store it is?</td><td><b>Shopify's short-lived proof pass.</b> The long-lived master key must not be sent just to prove identity.</td></tr>
+      <tr><td>How will OTTO write fixes into the store?</td><td>The connect step also hands the store's long-lived key to OTTO's <b>Connector Gateway</b> — the same service OTTO uses to reach every other system. Details with <b>Arslan Abbas</b>.</td></tr>
+      <tr><td>Which permissions do we ask for?</td><td>Read/write products, read/write content, read themes.</td></tr>
+      <tr><td>Which domain does the OTTO project use?</td><td>The store's <b>real (primary) domain</b>, not the internal Shopify address.</td></tr>
+      <tr><td>The rest of the plan (stored key + project ID + domain, view-only dashboard, log-in notice, uninstall cleanup)?</td><td><b>Approved as proposed.</b></td></tr>
+      <tr><td>The pixel / theme app embed?</td><td>A later topic, not part of this approval round.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="progress">
+  <h2>Progress so far</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Item</th><th>Status</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Lazaro's approval</td><td><span class="pill p-ok">Approved</span></td><td>6 Nov, Buzz thread in <code>product-shopify-app</code>. Arslan Abbas cc'd for the Connector Gateway details.</td></tr>
+      <tr><td>Proof method, permissions, project domain</td><td><span class="pill p-ok">Decided</span></td><td>Proof pass, not the master key · read/write products + content, read themes · real domain.</td></tr>
+      <tr><td>Connector Gateway handoff</td><td><span class="pill p-warn">Details open</span></td><td>Waiting on the conversation with Arslan Abbas. Shapes the exact handshake.</td></tr>
+      <tr><td>Test payments on dev stores</td><td><span class="pill p-ok">Live &amp; verified</span></td><td>A payment made on a listed dev store shows "you will not be billed for this test charge" and approves without any payment method. Verified end-to-end on a real dev store.</td></tr>
+      <tr><td>App remembers each store's real domain + deletes its record on uninstall</td><td><span class="pill p-ok">Merged</span></td><td>In <code>develop</code> (MR !27). Tested on a dev store: login creates the record, uninstall deletes it, reinstall recreates it. Not yet seen: a store with a real custom domain, and the first production deploy of the new table.</td></tr>
+      <tr><td>Store key moved out of web addresses + cancel-screen fix</td><td><span class="pill p-warn">Awaiting release</span></td><td>Written and merged, sitting in <code>develop</code> until the next release ships.</td></tr>
+      <tr><td>Three smaller backend security fixes</td><td><span class="pill p-warn">In review</span></td><td>MRs !492, !493, !494 (yours): genuine-ness check for Shopify notifications, hiding the key in the payment return address, and a clear error page instead of a crash when payment setup fails.</td></tr>
+      <tr><td><b>The two critical lock-downs</b></td><td><span class="pill p-bad">Not started</span></td><td>No ticket, no MR, nothing in flight — from the "What's wrong today" table, rows 1–3. <b>This is the next step.</b></td></tr>
+      <tr><td>Handshake, stored connection, view-only dashboard</td><td><span class="pill p-bad">Not started</span></td><td>Step 2 of the plan, comes after the lock-downs.</td></tr>
+      <tr><td>Pixel / theme app embed</td><td><span class="pill p-info">Later</span></td><td>Agreed as a later topic with Lazaro.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="pixel">
+  <h2>The pixel story</h2>
+  <ul>
+    <li><b>Old way (dead):</b> the app planted a script on the storefront directly. Shopify rejects new ones since 1 October 2026 and stops injecting existing ones on 1 March 2027.</li>
+    <li><b>New way:</b> a <b>theme app embed</b> — a block the merchant switches on once in their theme editor. Until they do, the pixel stays off; our screens will include a clear "Activate pixel" step.</li>
+    <li><b>Never run both at once</b> — the pixel would load twice. An old planted script is only removed after that store's embed is confirmed active.</li>
+    <li><b>Step 3 work,</b> after the connection itself is solid.</li>
+  </ul>
+</section>
+
+<section id="uninstall">
+  <h2>Uninstall and clean exit</h2>
+  <ol>
+    <li>The store's key is revoked — and the revocation call itself requires that key, so only the real app can do it.</li>
+    <li>The app drops its cached login pass. (Revoking the key alone isn't instant for passes already minted from it, so the cache drop matters.)</li>
+    <li>The app's record for the store is deleted — already working today, even in the awkward case where the merchant's session is already gone.</li>
+    <li>Reinstall goes through the handshake fresh and receives a brand-new key.</li>
+  </ol>
+  <p><b>Old stores keep an eye on:</b> the cleanup must run even when the merchant's session disappeared before the uninstall arrived (a known trap — the current handler gives up early in that case). It gets checked during Step 2 testing.</p>
+</section>
+
+<section id="existing">
+  <h2>Existing stores move over by themselves</h2>
+  <ul>
+    <li>No batch job, no merchant email, no action needed.</li>
+    <li>A connected store's first open of the new app version simply does the handshake and creates its record (marked internally as a "backfill").</li>
+    <li>Older paying stores whose project ID was never saved land in "Linked, no project" and link their project with one click of "Check again" — which matches on the exact domain only and creates nothing.</li>
+    <li>The backend's stored data for existing stores does not change.</li>
+    <li>Merchants running an older app version keep working until Step 4 removes the old answers; Shopify updates all merchants at once, so the overlap is short.</li>
+  </ul>
+</section>
+
+<section id="open">
+  <h2>Open questions</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Question</th><th>Who answers</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Is the "view-only" page truly locked on the server, or only made unclickable in the interface?</td><td>OTTO backend team</td><td>Until confirmed, we can't call it a real security boundary — only a view.</td></tr>
+      <tr><td>2</td><td>How exactly does the store's key reach OTTO's Connector Gateway, and what does OTTO do with it?</td><td>Arslan Abbas</td><td>Shapes the handshake. The conversation to have now.</td></tr>
+      <tr><td>3</td><td>Can two OTTO projects exist for the same domain, or is the second refused?</td><td>OTTO team</td><td>Decides how careful the payment-path fix must be.</td></tr>
+      <tr><td>4</td><td>Where does a paying merchant land — the Search Atlas website (today) or back inside Shopify?</td><td>Product</td><td>Returning to the app makes the handshake happen immediately and feels cleaner.</td></tr>
+      <tr><td>5</td><td>A merchant with several stores on one account: one key and one project per store?</td><td>Product</td><td>The design already allows it; the screens must make sense of it.</td></tr>
+      <tr><td>6</td><td>Is switching off the merchant's oldest-style API key on connect acceptable?</td><td>Backend / product</td><td>Could break a merchant's other tool that uses that old key.</td></tr>
+      <tr><td>7</td><td>Does key revocation take effect immediately, or with a short delay?</td><td>Backend</td><td>Decides how airtight uninstall cleanup is.</td></tr>
+      <tr><td>8</td><td>Which domain does the <b>pixel</b> itself match on?</td><td>OTTO team</td><td>The project uses the real domain (decided); the pixel's own matching is confirmed when the pixel topic is picked up.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="risks">
+  <h2>Risks and watch-outs</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Risk</th><th>How we handle it</th></tr></thead>
+    <tbody>
+      <tr><td><b>A bad phone number breaks payment confirmation</b> — after the merchant approves, they see a near-blank page with the single word "phone". Found while testing.</td><td>Needs its own ticket: ignore a bad phone instead of failing. Meanwhile, dev stores must have a valid phone set (a US-style number works).</td></tr>
+      <tr><td><b>Shopify's big key change (deadline 1 Jan 2027).</b> Long-lived keys must be replaced by short-lived ones; non-compliant apps are blocked from new installs, and old keys stop working in April 2027.</td><td>Separate work item. Two rules before it happens: the daily billing check must alert instead of auto-cancelling, and we must decide who refreshes the keys. Decide before December.</td></tr>
+      <tr><td><b>Losing the encryption key</b> makes every stored store key unreadable.</td><td>Keep it in the vault with a backup. Recovery is easy anyway: re-run the handshake, it mints a fresh key — no merchant action needed.</td></tr>
+      <tr><td><b>Uninstall arriving when the session is already gone</b> — the current handler gives up early and skips cleanup.</td><td>The new cleanup must not depend on the merchant's session. Checked during Step 2 testing on a dev store.</td></tr>
+      <tr><td><b>Old app versions keep asking the old question.</b></td><td>Keep the old answers working until Step 4. Shopify updates everyone at once, so the overlap is short.</td></tr>
+      <tr><td><b>Shopify's data-deletion requests are subscribed but not handled.</b></td><td>Tracked as separate compliance work. Our new record is one more thing the deletion must remove — noted there.</td></tr>
+      <tr><td><b>Double pixel</b> if an old planted script and the new embed both run.</td><td>Remove an old script only after that store's embed is confirmed active. Never both at once.</td></tr>
+      <tr><td><b>App-store badge rule</b> ("apps shouldn't mainly embed external pages").</td><td>Only matters if we chase the Built for Shopify badge. Keep native Shopify-style screens around the dashboard regardless.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="testing">
+  <h2>How we'll test</h2>
+  <p class="note crit"><b>Safety first:</b> dev stores only, never a real charge on production. A dev store must be on the backend's test-payment list — a store that isn't gets a <b>real</b> charge. And set a valid phone number on the dev store first, or the payment confirmation breaks.</p>
+  <p>Every case we will walk through before calling any step done:</p>
+  <ul>
+    <li>Wrong or missing key for a linked store → rejected, nothing saved.</li>
+    <li>Someone else's key on the log-in flow → rejected, no link created.</li>
+    <li>Fresh install + log-in, no project yet → friendly notice, no pixel planted.</li>
+    <li>Merchant creates the project, clicks "Check again" → dashboard appears, one pixel loads.</li>
+    <li>Merchant has two similarly named projects → picker shows exact domain matches only.</li>
+    <li>Fresh install + pay (test charge) → one project for the real domain, ID saved both sides, merchant lands on the dashboard — not an error page. Re-opening the payment confirmation link creates nothing new.</li>
+    <li>Existing connected store opens the new app → its record appears by itself, nothing else changes.</li>
+    <li>Existing store whose project was made under the real domain → found by exact match and linked; nothing created, nothing overwritten.</li>
+    <li>Dev store without a custom domain → internal address stored as-is, behaves exactly like today.</li>
+    <li>Opening the app several times in a day → no extra domain reads.</li>
+    <li>Dashboard page, network log → no login pass, no store key — only the project ID and the public share code.</li>
+    <li>Public dashboard opened in a private window → nothing can be edited or approved.</li>
+    <li>Uninstall → key shows as revoked, record gone; reinstall receives a new key.</li>
+    <li>Server restart → first page load re-fetches once, no errors.</li>
+    <li>Whitelabel brand customer → their own dashboard address is used.</li>
+  </ul>
+</section>
+
+<section id="next">
+  <h2>What's next</h2>
+  <div class="sub">
+    <h3>The next step</h3>
+    <p><b>Build the two critical backend lock-downs</b> — prove-the-store before answering, and stop saving strangers' keys. Nothing exists for them yet: no ticket, no MR. The three backend MRs currently in review (!492–!494) fix smaller holes and do not cover these.</p>
+    <h3>Decisions needed from Raza</h3>
+    <ol>
+      <li><b>Go-ahead</b> to build the two lock-downs as backend MRs (same pattern as !492–!494), plus tickets if none exist.</li>
+      <li><b>Parallel or sequential:</b> start the app-side Step 2 pieces that don't depend on the backend (encryption helper, connection module) now, or strictly after the lock-downs.</li>
+      <li><b>The encryption key</b> for storing store keys safely must be created in the vault by DevOps — worth requesting early so it's ready when the code is.</li>
+      <li><b>Ping Arslan Abbas</b> about the Connector Gateway — that conversation shapes the handshake.</li>
+      <li><b>The held release:</b> the app release carrying the "key out of web addresses" fix is waiting on a backend webhook fix (SHO-19). Decide whether that hold stays.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  Plain-words companion to the full technical plan: <code>shopify-otto-connect-plan.html</code> (same folder) · Project context: <code>shopify-project-context.md</code> · Lazaro's reply: <code>lazaru-message.md</code>.<br>
+  Written 2026-11-08. Research only — no application code was changed.
+</footer>
+
+</div>
+</body>
+</html>
