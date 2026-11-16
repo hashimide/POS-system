@@ -1,0 +1,1318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POS System Plan</title>
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --raised:#eef0f4; --line:#dde1e7;
+  --ink:#12161d; --body:#2a313b; --mute:#657083;
+  --accent:#3857d6; --accent-soft:#e6ebff;
+  --ok-bg:#e1f5e8; --ok-fg:#14733a;
+  --warn-bg:#fff2d2; --warn-fg:#8a5a00;
+  --info-bg:#e6ebff; --info-fg:#2b44a8;
+  --bad-bg:#fde5e5; --bad-fg:#b02323;
+  --shadow:0 1px 2px rgba(16,24,40,.06);
+  --f-body:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --f-mono:ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1015; --surface:#151a21; --raised:#1c222b; --line:#2b3340;
+    --ink:#f0f3f8; --body:#c6cedb; --mute:#8892a2;
+    --accent:#8ea3ff; --accent-soft:#1c2347;
+    --ok-bg:#11321d; --ok-fg:#4cc470;
+    --warn-bg:#2b2113; --warn-fg:#e6b647;
+    --info-bg:#1b2247; --info-fg:#a9b7ff;
+    --bad-bg:#2d1618; --bad-fg:#f58585;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1015; --surface:#151a21; --raised:#1c222b; --line:#2b3340;
+  --ink:#f0f3f8; --body:#c6cedb; --mute:#8892a2;
+  --accent:#8ea3ff; --accent-soft:#1c2347;
+  --ok-bg:#11321d; --ok-fg:#4cc470;
+  --warn-bg:#2b2113; --warn-fg:#e6b647;
+  --info-bg:#1b2247; --info-fg:#a9b7ff;
+  --bad-bg:#2d1618; --bad-fg:#f58585;
+  --shadow:none;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--body);font:15.5px/1.65 var(--f-body)}
+a{color:var(--accent)}
+code{font-family:var(--f-mono);font-size:.86em;background:var(--raised);border:1px solid var(--line);padding:.05em .35em;border-radius:4px;color:var(--ink);overflow-wrap:anywhere}
+pre{background:var(--raised);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow-x:auto;font:13px/1.55 var(--f-mono);color:var(--ink);margin:0}
+pre code{background:none;border:0;padding:0}
+h1,h2,h3,h4{color:var(--ink);line-height:1.25;margin:0}
+h1{font-size:clamp(28px,4.5vw,40px);letter-spacing:-.01em}
+h2{font-size:clamp(22px,3vw,27px);padding-top:22px;border-top:1px solid var(--line)}
+h3{font-size:17.5px;margin-top:6px}
+h4{font-size:15px}
+p{margin:0}
+ul,ol{margin:0;padding-left:1.25em;display:flex;flex-direction:column;gap:6px}
+li::marker{color:var(--mute)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.shell{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}
+nav.toc{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:22px 14px 28px 18px;border-right:1px solid var(--line);background:var(--surface)}
+nav.toc .brand{font-weight:700;color:var(--ink);font-size:15px;margin-bottom:2px}
+nav.toc .ver{font:12px/1.4 var(--f-mono);color:var(--mute);margin-bottom:14px}
+nav.toc a{display:block;padding:5px 10px;margin:1px 0;border-radius:6px;color:var(--body);text-decoration:none;font-size:13.5px;line-height:1.35}
+nav.toc a:hover{background:var(--raised)}
+nav.toc a.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+nav.toc .grp{font:600 11px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:16px 10px 6px}
+.tools{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 6px}
+button.btn{font:500 12.5px/1 var(--f-body);color:var(--body);background:var(--raised);border:1px solid var(--line);border-radius:6px;padding:7px 10px;cursor:pointer}
+button.btn:hover{border-color:var(--mute)}
+
+main{padding:40px clamp(16px,4vw,52px) 120px;max-width:1000px;width:100%}
+main>section{display:flex;flex-direction:column;gap:16px;margin-top:52px;scroll-margin-top:12px}
+main>section:first-of-type{margin-top:34px}
+.lead{font-size:17.5px;line-height:1.6;color:var(--body);max-width:68ch}
+.eyebrow{font:600 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;font:13px/1.4 var(--f-mono);color:var(--mute)}
+.meta b{color:var(--ink);font-weight:600}
+
+.banner{border:1px solid var(--line);border-left:4px solid var(--warn-fg);background:var(--warn-bg);color:var(--ink);border-radius:8px;padding:12px 16px}
+.banner.info{border-left-color:var(--info-fg);background:var(--info-bg)}
+.banner.ok{border-left-color:var(--ok-fg);background:var(--ok-bg)}
+.banner.bad{border-left-color:var(--bad-fg);background:var(--bad-bg)}
+.banner b{color:var(--ink)}
+
+.pill{display:inline-block;font:600 11px/1 var(--f-mono);letter-spacing:.04em;text-transform:uppercase;padding:4px 8px;border-radius:999px;white-space:nowrap;vertical-align:middle}
+.p-ok{background:var(--ok-bg);color:var(--ok-fg)}
+.p-info{background:var(--info-bg);color:var(--info-fg)}
+.p-warn{background:var(--warn-bg);color:var(--warn-fg)}
+.p-bad{background:var(--bad-bg);color:var(--bad-fg)}
+.p-mute{background:var(--raised);color:var(--mute)}
+
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow);min-width:0}
+.card p,.card li{font-size:14.5px}
+.card .k{font:600 11px/1 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.stat{font-size:26px;font-weight:700;color:var(--ink);line-height:1.1}
+
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface);-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+th{font:600 11.5px/1.3 var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--mute);background:var(--raised);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.c,th.c{text-align:center}
+.yes{color:var(--ok-fg);font-weight:700}
+.no{color:var(--mute)}
+
+details{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+details>summary{cursor:pointer;padding:12px 16px;font-weight:600;color:var(--ink);list-style:none;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";color:var(--mute);transition:transform .15s}
+details[open]>summary::before{transform:rotate(90deg)}
+details>summary .sub{font-weight:400;color:var(--mute);font-size:13.5px}
+details>.in{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+.dm{display:flex;flex-direction:column;gap:8px}
+
+.steps{counter-reset:s;display:flex;flex-direction:column}
+.step{display:grid;grid-template-columns:36px minmax(0,1fr);gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border-bottom:0}
+.step::before{counter-increment:s;content:counter(s);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:600 14px/1 var(--f-mono);color:var(--accent);background:var(--accent-soft)}
+.step>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.flow .n{flex:1 1 130px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:13.5px;position:relative}
+.flow .n b{display:block;color:var(--ink);margin-bottom:2px}
+.flow .arrow{align-self:center;color:var(--mute);font-size:18px}
+
+.phase{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.phase header{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.phase h3{margin:0}
+.goal{color:var(--body)}
+.pbar{height:8px;background:var(--raised);border-radius:99px;overflow:hidden;min-width:120px;flex:1 1 140px;max-width:260px}
+.pbar i{display:block;height:100%;width:0;background:var(--ok-fg);transition:width .25s}
+.ptxt{font:12px/1 var(--f-mono);color:var(--mute);white-space:nowrap}
+.checks{list-style:none;padding:0;gap:4px}
+.checks label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:5px 6px;border-radius:6px;font-size:14.5px}
+.checks label:hover{background:var(--raised)}
+.checks input{margin-top:5px;accent-color:var(--accent);flex:none}
+.checks input:checked+span{color:var(--mute);text-decoration:line-through}
+.done{background:var(--ok-bg);color:var(--ink);border-radius:8px;padding:10px 14px;font-size:14px}
+
+.diagram{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;overflow-x:auto}
+.diagram svg{display:block;min-width:640px;width:100%;height:auto}
+svg .box{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+svg .box.a{fill:var(--accent-soft);stroke:var(--accent)}
+svg .box.g{fill:var(--ok-bg);stroke:var(--ok-fg)}
+svg .box.y{fill:var(--warn-bg);stroke:var(--warn-fg)}
+svg text{fill:var(--ink);font:600 13px var(--f-body)}
+svg text.s{fill:var(--mute);font:400 11.5px var(--f-body)}
+svg text.m{font:600 12px var(--f-mono)}
+svg .ln{stroke:var(--mute);stroke-width:1.5;fill:none}
+svg .ln.d{stroke-dasharray:4 4}
+svg .lbl{fill:var(--mute);font:11px var(--f-mono)}
+
+.wire{border:2px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden;font-size:13px}
+.wire .bar{display:flex;gap:10px;align-items:center;padding:8px 12px;background:var(--raised);border-bottom:1px solid var(--line);color:var(--mute);font:12px var(--f-mono)}
+.wire .body{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);min-height:300px}
+.wire .l{padding:12px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.wire .r{padding:12px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.wire .search{border:1px dashed var(--mute);border-radius:6px;padding:8px 10px;color:var(--mute)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.tile{border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface)}
+.tile b{display:block;color:var(--ink);font-size:12.5px}
+.tile span{color:var(--mute);font-size:11.5px}
+.line{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.line.t{font-weight:700;color:var(--ink);border-bottom:0;font-size:15px}
+.paybtn{margin-top:auto;background:var(--accent);color:#fff;text-align:center;border-radius:8px;padding:10px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--raised);font-size:12.5px}
+
+dl.gl{display:grid;grid-template-columns:minmax(120px,200px) minmax(0,1fr);gap:0;margin:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+dl.gl dt,dl.gl dd{margin:0;padding:10px 14px;border-bottom:1px solid var(--line)}
+dl.gl dt{font-weight:600;color:var(--ink);background:var(--raised)}
+dl.gl dt:last-of-type,dl.gl dd:last-of-type{border-bottom:0}
+
+@media (max-width:980px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  nav.toc{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}
+  nav.toc .links{display:flex;flex-wrap:wrap;gap:4px}
+  nav.toc .grp{width:100%;margin:10px 4px 2px}
+  .g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:620px){
+  .g2,.g3,.g4{grid-template-columns:minmax(0,1fr)}
+  .wire .body{grid-template-columns:minmax(0,1fr)}
+  .wire .l{border-right:0;border-bottom:1px solid var(--line)}
+  dl.gl{grid-template-columns:minmax(0,1fr)}
+  dl.gl dt{border-bottom:0;padding-bottom:2px}
+}
+@media print{
+  nav.toc,.tools{display:none}
+  .shell{display:block}
+  body{background:#fff}
+  main{max-width:none;padding:0}
+  section,.card,.phase,details{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ============ NAV ============ -->
+<nav class="toc" aria-label="Contents">
+  <div class="brand">POS System Plan</div>
+  <div class="ver">draft v0.3 · 2026-11-17</div>
+  <div class="tools">
+    <button class="btn" id="themeBtn" type="button">Light / dark</button>
+    <button class="btn" id="expandBtn" type="button">Expand all</button>
+    <button class="btn" id="printBtn" type="button">Print</button>
+  </div>
+  <div class="links">
+    <div class="grp">Start here</div>
+    <a href="#overview">Overview</a>
+    <a href="#decisions">Decisions so far</a>
+    <a href="#agenda">Agenda for your call</a>
+    <div class="grp">Understand</div>
+    <a href="#basics">What is a POS?</a>
+    <a href="#constraints">Goals and constraints</a>
+    <a href="#pakistan">Pakistan considerations</a>
+    <div class="grp">Design</div>
+    <a href="#stack">Tech stack</a>
+    <a href="#setup">Local setup (free)</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#structure">Code structure</a>
+    <a href="#rules">Core rules</a>
+    <a href="#money">Money and rounding</a>
+    <a href="#data">Data model</a>
+    <a href="#variants">Variants and weight</a>
+    <a href="#flows">Key flows</a>
+    <a href="#sale-example">A sale, row by row</a>
+    <a href="#roles">Roles and permissions</a>
+    <a href="#screens">Screens</a>
+    <a href="#hardware">Hardware</a>
+    <div class="grp">Plan</div>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#split">Work split</a>
+    <a href="#workflow">Team workflow</a>
+    <a href="#testing">Testing</a>
+    <a href="#risks">Risks</a>
+    <a href="#questions">Open questions</a>
+    <div class="grp">Reference</div>
+    <a href="#glossary">Glossary</a>
+    <a href="#log">Decision and change log</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ============ OVERVIEW ============ -->
+<section id="overview">
+  <div class="eyebrow">Planning document · Laravel + PostgreSQL · zero budget</div>
+  <h1>POS System: the whole plan in one page</h1>
+  <p class="lead">A point-of-sale web application, built with Laravel and PostgreSQL, running on a PC first, developed locally and shared through GitHub. It must be correct about money, honest about stock, and cost nothing to build.</p>
+  <div class="meta">
+    <span><b>Status</b> planning, no code yet</span>
+    <span><b>Last updated</b> 2026-11-17</span>
+    <span><b>Repo</b> hashimide/POS-system</span>
+    <span><b>Working branch</b> develop</span>
+  </div>
+  <div class="banner">
+    <b>This is a living document.</b> Everything here is a starting proposal. We expect to change it, a lot, as we decide the open questions and learn more. When something changes, update this file (and the matching Markdown files in the same folder) in the same pull request, and add a line to the <a href="#log">log</a>.
+  </div>
+
+  <div class="grid g4">
+    <div class="card"><span class="k">Backend</span><span class="stat">Laravel</span><p>PHP framework, decided</p></div>
+    <div class="card"><span class="k">Database</span><span class="stat">PostgreSQL</span><p>Free, strong with money data, decided</p></div>
+    <div class="card"><span class="k">Platform</span><span class="stat">Web, PC first</span><p>Runs on localhost for now</p></div>
+    <div class="card"><span class="k">Budget</span><span class="stat">Rs 0</span><p>Free tools, GitHub and local machines only</p></div>
+  </div>
+
+  <h3>How to use this page</h3>
+  <ul>
+    <li>Use the menu on the left (or the chips at the top on a phone) to jump around. <b>Read &ldquo;Decisions so far&rdquo; and &ldquo;Agenda for your call&rdquo; first.</b></li>
+    <li>Sections with a ▸ arrow open and close. &ldquo;Expand all&rdquo; opens everything, which is handy before printing.</li>
+    <li>The roadmap has tick boxes. Your ticks are saved <b>only in your own browser</b>, so they are for personal tracking. For shared tracking, turn each item into a GitHub Issue.</li>
+    <li>The same content also exists as <code>ARCHITECTURE.md</code> and <code>ROADMAP.md</code> in this folder. Keep them in step with this page.</li>
+  </ul>
+
+  <h3>What is in this document</h3>
+  <div class="grid g3">
+    <div class="card"><h4>1. Understand</h4><p>What a POS is, the constraints we work under, and what Pakistan adds to the picture.</p></div>
+    <div class="card"><h4>2. Design</h4><p>Stack, architecture, database tables, weighted items and variants, flows, roles, screens, hardware.</p></div>
+    <div class="card"><h4>3. Plan</h4><p>Roadmap in phases with checklists, who does what, team workflow, testing, risks, and the questions still open.</p></div>
+  </div>
+</section>
+
+<!-- ============ DECISIONS ============ -->
+<section id="decisions">
+  <h2>Decisions so far</h2>
+  <p>Three states are used everywhere in this document:</p>
+  <div class="chips"><span class="pill p-ok">Decided</span> <span class="pill p-info">Proposed: default unless someone objects</span> <span class="pill p-warn">Open: needs a decision</span></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Topic</th><th>Status</th><th>What we have</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td>Backend</td><td><span class="pill p-ok">Decided</span></td><td>Laravel</td><td>Sets the whole code structure.</td></tr>
+      <tr><td>Database</td><td><span class="pill p-ok">Decided</span></td><td>PostgreSQL</td><td>Transactions and exact decimal numbers for money and weights.</td></tr>
+      <tr><td>Platform</td><td><span class="pill p-ok">Decided</span></td><td>Web app, PC first. Tablet/phone later.</td><td>Keyboard and mouse design, big screen layout.</td></tr>
+      <tr><td>Budget</td><td><span class="pill p-ok">Decided</span></td><td>Zero. GitHub and local environment only.</td><td>No paid hosting, services, or card gateways for now.</td></tr>
+      <tr><td>Selling at zero stock</td><td><span class="pill p-ok">Decided</span></td><td>If stock is zero (or less than the quantity asked for), the sale is blocked.</td><td>Needs row locking so two cashiers cannot sell the last item at once.</td></tr>
+      <tr><td>Items sold by weight</td><td><span class="pill p-ok">Decided</span></td><td>Yes, weighted/decimal quantities are needed.</td><td>Quantities must be decimals (for example 1.250 kg), not integers.</td></tr>
+      <tr><td>Item variants</td><td><span class="pill p-ok">Decided</span></td><td>Yes, variants are needed (size, colour, pack and so on).</td><td>Stock, price and barcode live on the variant, not the product. See <a href="#variants">Variants and weight</a>.</td></tr>
+      <tr><td>Country</td><td><span class="pill p-info">Proposed</span></td><td>Pakistan (PKR), not 100% sure.</td><td>Currency, tax rules, language, receipts. See <a href="#pakistan">Pakistan considerations</a>.</td></tr>
+      <tr><td>Business type</td><td><span class="pill p-warn">Open</span></td><td>Not decided.</td><td>Decides tables/tips, scales, expiry dates, prescriptions, and more.</td></tr>
+      <tr><td>One store or many</td><td><span class="pill p-warn">Open</span></td><td>Not decided. Recommendation: single store for version 1.</td><td>Multi-branch touches almost every table.</td></tr>
+      <tr><td>Frontend</td><td><span class="pill p-warn">Open</span></td><td>Whatever suits Laravel. Recommendation: Inertia + Vue.</td><td>Decides how both of us write screens. See <a href="#stack">Tech stack</a>.</td></tr>
+      <tr><td>Tax setup</td><td><span class="pill p-warn">Open</span></td><td>Depends on business type and country.</td><td>Inclusive or exclusive prices, one rate or several.</td></tr>
+      <tr><td>Languages</td><td><span class="pill p-warn">Open</span></td><td>English only, or English + Urdu?</td><td>Right-to-left layout, Urdu product names, receipts.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="banner info"><b>Good news:</b> none of the open items blocks Phase 0 (project setup). Business type, tax and frontend should be settled <b>before Phase 1</b> starts.</div>
+</section>
+
+<!-- ============ AGENDA ============ -->
+<section id="agenda">
+  <h2>Agenda for your call with Hashim</h2>
+  <p>A short list of things to settle together. Each has a recommendation so you are not starting from a blank page. Tick them off as you go (saved in your browser).</p>
+  <div class="phase">
+    <ul class="checks">
+      <li><label><input type="checkbox" data-id="ag1"><span><b>Business type.</b> Pick one real target (for example a grocery/general store, which fits weighted items and variants). Recommendation: choose the shop type you know best or can visit.</span></label></li>
+      <li><label><input type="checkbox" data-id="ag2"><span><b>Frontend.</b> Pick Inertia + Vue, Inertia + React, or Livewire. Recommendation: whichever one of you already knows. If neither, Inertia + Vue.</span></label></li>
+      <li><label><input type="checkbox" data-id="ag3"><span><b>Country, currency, tax.</b> Confirm Pakistan / PKR. Decide tax-inclusive or exclusive, and check whether the chosen business must integrate with FBR (see <a href="#pakistan">Pakistan</a>).</span></label></li>
+      <li><label><input type="checkbox" data-id="ag4"><span><b>Single store or branches.</b> Recommendation: single store for version 1.</span></label></li>
+      <li><label><input type="checkbox" data-id="ag5"><span><b>Languages.</b> English only first, or Urdu names and receipts from day one.</span></label></li>
+      <li><label><input type="checkbox" data-id="ag6"><span><b>Who does what.</b> Split backend and frontend work so you rarely edit the same files (see <a href="#split">Work split</a>).</span></label></li>
+      <li><label><input type="checkbox" data-id="ag7"><span><b>Workflow.</b> Agree: branches from <code>develop</code>, pull requests, the other person reviews (see <a href="#workflow">Team workflow</a>).</span></label></li>
+    </ul>
+  </div>
+  <h3>Right after the call</h3>
+  <div class="grid g3">
+    <div class="card"><span class="k">Day 1</span><p>Update the &ldquo;Decisions so far&rdquo; table and the change log with what you agreed. Push that as a small pull request.</p></div>
+    <div class="card"><span class="k">Days 2 to 3</span><p>Both of you install PHP, Composer, PostgreSQL and Node. One of you creates the Laravel project, the other reviews the pull request.</p></div>
+    <div class="card"><span class="k">Week 1</span><p>Finish Phase 0 (CI green, README setup works on both machines), then open the Phase 1 issues on GitHub.</p></div>
+  </div>
+</section>
+
+<!-- ============ BASICS ============ -->
+<section id="basics">
+  <h2>What is a POS?</h2>
+  <p>POS means <b>Point of Sale</b>: the software a business uses at the moment a customer pays. It is the till, plus the bookkeeping behind it.</p>
+  <h3>The core flow</h3>
+  <div class="flow">
+    <div class="n"><b>1. Pick items</b>Scan a barcode, search, or tap a product.</div><span class="arrow">→</span>
+    <div class="n"><b>2. Build cart</b>Quantities, weights, discounts, tax.</div><span class="arrow">→</span>
+    <div class="n"><b>3. Pay</b>Cash with change, or card, bank transfer, wallet.</div><span class="arrow">→</span>
+    <div class="n"><b>4. Save sale</b>One safe transaction in the database.</div><span class="arrow">→</span>
+    <div class="n"><b>5. Update stock</b>Items sold are deducted.</div><span class="arrow">→</span>
+    <div class="n"><b>6. Receipt</b>Printed or shown on screen.</div>
+  </div>
+  <p>Everything else in a POS is built around these six steps.</p>
+
+  <h3>The main parts</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td>Catalog</td><td>Products, variants, categories, prices, barcodes, units (piece, kg, dozen).</td></tr>
+      <tr><td>Checkout screen</td><td>The cashier's main screen: cart, quantities, discounts, payment.</td></tr>
+      <tr><td>Payments</td><td>Cash with change, card, bank transfer, wallets, split payments, refunds.</td></tr>
+      <tr><td>Inventory</td><td>Tracks stock, deducts on sale, blocks sale at zero, warns when low.</td></tr>
+      <tr><td>Receipts</td><td>Itemised, with tax and a unique receipt number.</td></tr>
+      <tr><td>Users and roles</td><td>Cashier, manager and admin with different permissions.</td></tr>
+      <tr><td>Customers</td><td>Optional: customer records, purchase history, credit (udhaar), loyalty.</td></tr>
+      <tr><td>Shifts and cash drawer</td><td>Opening and closing cash counts so the till balances at day end.</td></tr>
+      <tr><td>Reports</td><td>Daily sales, best sellers, sales per cashier, low stock, profit.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>What makes POS software tricky</h3>
+  <div class="grid g2">
+    <div class="card"><h4>Money must be exact</h4><p>No floating-point numbers. Totals, tax and change must always add up to the paisa.</p></div>
+    <div class="card"><h4>Never lose a sale</h4><p>A sale is saved fully or not at all. Power cuts and double clicks must not corrupt data.</p></div>
+    <div class="card"><h4>Speed</h4><p>A queue of customers is waiting. Searching, scanning and paying must feel instant.</p></div>
+    <div class="card"><h4>Audit trail</h4><p>Sales are never silently edited. Mistakes are fixed by voids and refunds that record who and why.</p></div>
+  </div>
+</section>
+
+<!-- ============ CONSTRAINTS ============ -->
+<section id="constraints">
+  <h2>Goals and constraints</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Constraint</th><th>What it means for us</th></tr></thead>
+    <tbody>
+      <tr><td>Zero budget</td><td>Free and open-source tools only. No paid hosting, paid APIs, or services with monthly fees. If a feature needs money, it goes to the &ldquo;later&rdquo; list.</td></tr>
+      <tr><td>Local first</td><td>We build and run everything on our own PCs. Deployment is a later concern.</td></tr>
+      <tr><td>PC first</td><td>Primary screen is a desktop or laptop browser, with keyboard and mouse. Tablet and phone layouts come later.</td></tr>
+      <tr><td>Two-person team</td><td>Boring, well-known tools that both of us can work in. Small pull requests, clear ownership.</td></tr>
+      <tr><td>Correctness over features</td><td>A POS that miscalculates or loses a sale is worse than no POS. We prefer fewer features that are right.</td></tr>
+      <tr><td>Public repository</td><td>Anyone can read the code. Never commit passwords, <code>.env</code> files, keys or real customer data.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid g2">
+    <div class="card"><h4>Goals for version 1</h4>
+      <ul><li>Cashier can log in and sell products, including weighed items</li><li>Totals, tax and change are always right</li><li>Stock goes down on every sale and a sale is blocked at zero</li><li>A receipt can be printed</li><li>A manager can see the day's sales</li></ul></div>
+    <div class="card"><h4>Deliberately not in version 1</h4>
+      <ul><li>Online card payments (fees)</li><li>Multiple branches</li><li>Loyalty programmes</li><li>Offline mobile app</li><li>Cloud hosting</li></ul></div>
+  </div>
+</section>
+
+<!-- ============ PAKISTAN ============ -->
+<section id="pakistan">
+  <h2>Pakistan considerations</h2>
+  <div class="banner">
+    <b>Please verify before relying on this section.</b> This is general background, not legal or tax advice. Rules and rates change. Confirm current details with an accountant or the official authority (FBR for federal tax, the provincial revenue authorities for provincial tax) before you build anything that depends on them.
+  </div>
+  <div class="grid g2">
+    <div class="card"><h4>Currency and rounding</h4>
+      <p>PKR, written &ldquo;Rs&rdquo;. One rupee is 100 paisa. We store money as an integer number of paisa. In everyday cash trade, paisa coins are not used, so shops usually round the final cash amount to the nearest rupee. The system should support a <b>cash rounding rule</b> that is recorded on the receipt as a separate line.</p></div>
+    <div class="card"><h4>Sales tax</h4>
+      <p>Goods generally attract federal sales tax (GST) at a standard rate (commonly 18%, but check the current rate), some items are exempt or taxed differently, and services are taxed by the provinces at their own rates. So the system needs <b>several tax rates</b>, assignable per product, with a shop-wide choice of <b>tax-inclusive</b> or <b>tax-exclusive</b> prices.</p></div>
+    <div class="card"><h4>FBR POS integration</h4>
+      <p>Certain categories of retailers are required to connect their POS to FBR so that each invoice gets an official invoice number (and a QR code on the receipt). Whether this applies depends on the kind and size of business. It is <b>an important reason to choose the target business early</b>, because an FBR integration is a separate piece of work and may involve registration steps. Check requirements and any costs before promising it.</p></div>
+    <div class="card"><h4>Payment methods</h4>
+      <p>Cash, debit/credit card, bank transfer (including Raast), and mobile wallets such as JazzCash and Easypaisa are common. With a zero budget we <b>record</b> these as payment methods with a reference number. We do not integrate with gateways or terminals (those cost money).</p></div>
+    <div class="card"><h4>Language</h4>
+      <p>Many shops think and talk in Urdu. Plan for Urdu product names (stored as normal UTF-8 text), and possibly bilingual receipts and right-to-left layout. Decide early if this is required, because it affects every screen.</p></div>
+    <div class="card"><h4>Units sold loose</h4>
+      <p>Kilograms, grams, litres, metres, dozens and packs are all common. This is why weighted/decimal quantities and a <b>units table</b> are in the design from the start.</p></div>
+    <div class="card"><h4>Customer credit (udhaar)</h4>
+      <p>Selling on credit and keeping a ledger per customer is common in many local shops. It is not in version 1, but the customer and payment tables are designed so a &ldquo;credit&rdquo; payment method and a customer balance can be added later without rewriting sales.</p></div>
+    <div class="card"><h4>Power cuts</h4>
+      <p>Load-shedding is a real risk. Every sale is saved in a single database transaction, so a power cut cannot leave a half-saved sale. Recommend a UPS for the shop PC, and <b>automatic backups</b> before any real use.</p></div>
+  </div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section id="stack">
+  <h2>Tech stack</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Layer</th><th>Choice</th><th>Status</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Backend</td><td><b>Laravel</b> (latest stable when we create the project), PHP 8.3+</td><td><span class="pill p-ok">Decided</span></td><td>Routing, database, validation, auth and testing are built in.</td></tr>
+      <tr><td>Database</td><td><b>PostgreSQL</b></td><td><span class="pill p-ok">Decided</span></td><td>Reliable transactions, exact <code>numeric</code> type, row locking with <code>FOR UPDATE</code>.</td></tr>
+      <tr><td>Frontend</td><td><b>Inertia.js + Vue 3 + Tailwind CSS</b></td><td><span class="pill p-warn">Open</span></td><td>See comparison below. Recommended, not final.</td></tr>
+      <tr><td>Auth</td><td>Laravel starter-kit login (Breeze/Fortify)</td><td><span class="pill p-info">Proposed</span></td><td>Email and password, sessions. Good enough for a local PC.</td></tr>
+      <tr><td>Roles</td><td>A <code>role</code> column + Laravel Policies</td><td><span class="pill p-info">Proposed</span></td><td>Move to <code>spatie/laravel-permission</code> only if we need fine-grained rules.</td></tr>
+      <tr><td>Testing</td><td>Pest (or PHPUnit)</td><td><span class="pill p-info">Proposed</span></td><td>Tests run against a real PostgreSQL database.</td></tr>
+      <tr><td>Code style</td><td>Laravel Pint</td><td><span class="pill p-info">Proposed</span></td><td>One command formats all PHP.</td></tr>
+      <tr><td>CI</td><td>GitHub Actions</td><td><span class="pill p-info">Proposed</span></td><td>Free for public repositories. Runs tests and Pint on every pull request.</td></tr>
+      <tr><td>Tracking</td><td>GitHub Issues, Milestones, Projects</td><td><span class="pill p-info">Proposed</span></td><td>Free. One milestone per roadmap phase.</td></tr>
+      <tr><td>Hosting</td><td>None for now</td><td><span class="pill p-ok">Decided</span></td><td>Runs on localhost. See <a href="#setup">setup</a> and <a href="#hardware">hardware</a> for later options.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Choosing the frontend (the open decision)</h3>
+  <p>All three options work with Laravel, all are free. The best choice is the one you and Hashim can both work in.</p>
+  <div class="grid g3">
+    <div class="card"><h4>Inertia + Vue <span class="pill p-info">Recommended</span></h4>
+      <ul><li>Laravel's default starter kit pairing</li><li>App-like, fast cashier screen</li><li>Gentle learning curve, great docs</li><li>Needs some JavaScript knowledge</li></ul></div>
+    <div class="card"><h4>Inertia + React</h4>
+      <ul><li>Also an official starter kit</li><li>Huge ecosystem and job relevance</li><li>Slightly more boilerplate than Vue</li><li>Pick this if one of you already knows React</li></ul></div>
+    <div class="card"><h4>Livewire</h4>
+      <ul><li>Write screens mostly in PHP</li><li>Least JavaScript to learn</li><li>Real-time cart and instant search are trickier to make snappy</li><li>Good fit if neither of you wants to learn JS</li></ul></div>
+  </div>
+  <div class="banner info"><b>Rule of thumb:</b> if either of you already knows Vue or React, use that one. If neither does and you want the fastest start, use Inertia + Vue. Avoid mixing two frontends in one project.</div>
+</section>
+
+<!-- ============ SETUP ============ -->
+<section id="setup">
+  <h2>Local setup (all free, Windows)</h2>
+  <p>Install these once on each machine. Each of you has your <b>own local database</b>. You share the structure through <i>migrations</i> and sample data through <i>seeders</i>, never by sending database files.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Tool</th><th>Used for</th><th>Where from</th></tr></thead>
+    <tbody>
+      <tr><td>PHP 8.3+ and Composer</td><td>Run Laravel, install PHP packages</td><td>Laravel's Windows installer (php.new) or Laragon</td></tr>
+      <tr><td>PostgreSQL</td><td>The database (includes the pgAdmin viewer)</td><td>Official installer from postgresql.org</td></tr>
+      <tr><td>Node.js (LTS)</td><td>Builds the Vue/Tailwind frontend (Vite)</td><td>nodejs.org</td></tr>
+      <tr><td>Git and GitHub CLI</td><td>Version control and pull requests</td><td>Already installed on your machine</td></tr>
+      <tr><td>A code editor</td><td>Writing code</td><td>VS Code (free)</td></tr>
+    </tbody>
+  </table></div>
+  <h3>What &ldquo;clone to running&rdquo; should look like (target for Phase 0)</h3>
+  <pre><code>git clone https://github.com/hashimide/POS-system.git
+cd POS-system
+composer install
+npm install
+copy .env.example .env          # then set the PostgreSQL password in .env
+php artisan key:generate
+php artisan migrate --seed      # creates tables and demo data
+npm run dev                     # in one terminal
+php artisan serve               # in another terminal; open http://localhost:8000</code></pre>
+  <p>The exact commands will be confirmed and written into the README when the Laravel project is created in Phase 0. Docker (Laravel Sail) is another option, but native installs are simpler on Windows 10 Home.</p>
+  <div class="banner bad"><b>Public repo warning:</b> the <code>.env</code> file holds your database password. It must stay in <code>.gitignore</code>. Only <code>.env.example</code> (with fake values) is committed.</div>
+</section>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section id="architecture">
+  <h2>Architecture</h2>
+  <p>One Laravel application serves both the cashier screen and the back-office. There is no separate API server at the start. If we later need a mobile app or an offline client, we add a JSON API on top of the same business logic.</p>
+  <div class="diagram">
+    <svg viewBox="0 0 900 360" role="img" aria-label="Three-layer architecture: browser, Laravel application, PostgreSQL">
+      <rect class="box a" x="40" y="14" width="820" height="96" rx="12"/>
+      <text x="60" y="40">Browser on the shop PC</text>
+      <text class="s" x="60" y="60">Vue pages delivered through Inertia</text>
+      <rect class="box" x="60" y="70" width="230" height="30" rx="6"/><text class="s" x="76" y="90">Cashier / checkout screen</text>
+      <rect class="box" x="310" y="70" width="230" height="30" rx="6"/><text class="s" x="326" y="90">Products, stock, variants</text>
+      <rect class="box" x="560" y="70" width="280" height="30" rx="6"/><text class="s" x="576" y="90">Sales history, shifts, reports, settings</text>
+      <path class="ln" d="M450 110 V140"/><text class="lbl" x="462" y="130">HTTP (localhost for now)</text>
+      <rect class="box g" x="40" y="140" width="820" height="130" rx="12"/>
+      <text x="60" y="166">Laravel application</text>
+      <rect class="box" x="60" y="178" width="150" height="40" rx="6"/><text class="m" x="72" y="203">Routes</text>
+      <rect class="box" x="230" y="178" width="170" height="40" rx="6"/><text class="m" x="242" y="203">Controllers</text>
+      <rect class="box" x="420" y="178" width="190" height="40" rx="6"/><text class="m" x="432" y="203">Form Requests</text>
+      <rect class="box" x="630" y="178" width="210" height="40" rx="6"/><text class="m" x="642" y="203">Policies (permissions)</text>
+      <rect class="box" x="60" y="226" width="380" height="34" rx="6"/><text class="m" x="72" y="248">Actions: CompleteSale, RefundSale, ...</text>
+      <rect class="box" x="460" y="226" width="380" height="34" rx="6"/><text class="m" x="472" y="248">Eloquent models + Money helper</text>
+      <path class="ln" d="M450 270 V298"/><text class="lbl" x="462" y="289">SQL in transactions</text>
+      <rect class="box y" x="40" y="298" width="820" height="52" rx="12"/>
+      <text x="60" y="322">PostgreSQL</text><text class="s" x="60" y="340">products, variants, sales, payments, stock movements, users, shifts</text>
+    </svg>
+  </div>
+  <h3>Where the business logic lives</h3>
+  <p>Controllers stay thin. Rules that matter (completing a sale, refunding, adjusting stock) live in <b>Action classes</b>, so they are reusable and easy to test without a browser.</p>
+  <div class="grid g3">
+    <div class="card"><h4>Controllers</h4><p>Receive the request, call an Action, return a page or a redirect. No calculations here.</p></div>
+    <div class="card"><h4>Actions</h4><p>One class per business operation. Each runs inside a database transaction and is covered by tests.</p></div>
+    <div class="card"><h4>Models</h4><p>Describe tables and relationships. Never trusted for totals: totals are always recomputed on the server.</p></div>
+  </div>
+</section>
+
+<!-- ============ STRUCTURE ============ -->
+<section id="structure">
+  <h2>Code structure</h2>
+  <p>This is the standard Laravel layout with a few additions of our own.</p>
+<pre><code>POS-system/
+├─ app/
+│  ├─ Actions/
+│  │  ├─ Sales/        CompleteSale, VoidSale, RefundSale
+│  │  ├─ Stock/        AdjustStock, ReceiveStock
+│  │  └─ Shifts/       OpenShift, CloseShift
+│  ├─ Http/
+│  │  ├─ Controllers/  thin controllers
+│  │  └─ Requests/     validation (Form Requests)
+│  ├─ Models/          Product, ProductVariant, Sale, SaleItem, Payment, ...
+│  ├─ Policies/        who may do what
+│  └─ Support/         Money.php, Quantity.php (exact-number helpers)
+├─ database/
+│  ├─ migrations/      table definitions, shared via Git
+│  └─ seeders/         demo products, demo users
+├─ resources/js/
+│  ├─ Pages/           Checkout, Products, Stock, Sales, Reports, Settings
+│  └─ Components/      Cart, ProductSearch, PaymentDialog, Receipt
+├─ routes/web.php
+├─ tests/Feature/      checkout, stock, refunds, shifts
+├─ docs/               ARCHITECTURE.md, ROADMAP.md, pos-plan.html
+└─ .github/workflows/  CI: tests + Pint</code></pre>
+</section>
+
+<!-- ============ RULES ============ -->
+<section id="rules">
+  <h2>Core rules (non-negotiable)</h2>
+  <p>These are the rules that stop a POS from becoming untrustworthy. Anything that breaks one of them is a bug.</p>
+  <div class="steps">
+    <div class="step"><div><h4>Money is an exact integer</h4><p>Store amounts as whole paisa (<code>price_cents</code> in the draft schema, 1 rupee = 100). Never floats. Format for display only at the edge.</p></div></div>
+    <div class="step"><div><h4>Quantities are exact decimals</h4><p>Quantities use <code>numeric(12,3)</code> in PostgreSQL (for example 1.250 kg). In PHP use exact-decimal maths (BCMath or a decimal library), not floats.</p></div></div>
+    <div class="step"><div><h4>Sales are never edited or deleted</h4><p>A mistake is corrected by a <b>void</b> or a <b>refund</b>, each its own record with a user and a reason.</p></div></div>
+    <div class="step"><div><h4>Snapshot prices on the sale</h4><p><code>sale_items</code> copies the product name, variant name, unit and unit price at the time of sale. Changing a price later never changes an old receipt.</p></div></div>
+    <div class="step"><div><h4>Stock is a ledger</h4><p>Every change goes through a <code>stock_movements</code> row (sale, refund, purchase, adjustment). The stock total on the variant is a cached sum, updated in the same transaction.</p></div></div>
+    <div class="step"><div><h4>Selling is all-or-nothing</h4><p>Sale, items, payments and stock movements are saved in <b>one database transaction</b>. If any step fails, nothing is saved.</p></div></div>
+    <div class="step"><div><h4>Block the sale at zero stock</h4><p>If requested quantity is more than available stock, the sale is refused. Product rows are locked while checking, so two cashiers cannot sell the last item together. (Items marked &ldquo;do not track stock&rdquo; are exempt, for example services.)</p></div></div>
+    <div class="step"><div><h4>No double submissions</h4><p>The checkout request carries a unique key. A double-click or a retry can never create two sales.</p></div></div>
+    <div class="step"><div><h4>The server never trusts the browser's totals</h4><p>The browser sends items and quantities. The server finds the prices and works out all totals itself.</p></div></div>
+    <div class="step"><div><h4>Everything sensitive is attributable</h4><p>Voids, refunds, price changes, stock adjustments and large discounts record who did it and when.</p></div></div>
+    <div class="step"><div><h4>No secrets in Git</h4><p>The repository is public. No <code>.env</code>, no keys, no real customer data, ever.</p></div></div>
+  </div>
+</section>
+
+<!-- ============ MONEY ============ -->
+<section id="money">
+  <h2>Money, weight and rounding</h2>
+  <p>Worked examples (in rupees for readability; the database stores paisa). These double as the first automated tests we should write.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Case</th><th>Calculation</th><th>Result</th><th>Stored</th></tr></thead>
+    <tbody>
+      <tr><td>Simple item</td><td>3 × Rs 33.33</td><td>Rs 99.99</td><td><code>9999</code></td></tr>
+      <tr><td>Weighed item, exact</td><td>1.250 kg × Rs 480.00 per kg</td><td>Rs 600.00</td><td><code>60000</code></td></tr>
+      <tr><td>Weighed item, needs rounding</td><td>0.375 kg × Rs 349.00 per kg = 130.875</td><td>Rs 130.88 (round half up)</td><td><code>13088</code></td></tr>
+      <tr><td>Tax-exclusive</td><td>Rs 500.00 + 18% tax</td><td>Rs 590.00 (tax Rs 90.00)</td><td><code>59000</code></td></tr>
+      <tr><td>Tax-inclusive</td><td>Rs 590.00 already includes 18%: net = 590 ÷ 1.18</td><td>Net Rs 500.00, tax Rs 90.00</td><td><code>50000</code> + <code>9000</code></td></tr>
+      <tr><td>Cash rounding</td><td>Total Rs 130.88, cash rounded to nearest rupee</td><td>Cash due Rs 131.00, adjustment +Rs 0.12</td><td>adjustment line <code>12</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid g2">
+    <div class="card"><h4>Rounding rule (proposed)</h4><p>Round each <b>line</b> to the nearest paisa (half up) after multiplying price by quantity. Sum the lines. Then apply tax rules. Document the rule once, in one helper, and use it everywhere.</p></div>
+    <div class="card"><h4>Why this matters</h4><p>If the checkout screen, the receipt and the report each round a bit differently, the books never match. One <code>Money</code> helper and a test for every example above prevents that.</p></div>
+  </div>
+  <div class="banner info"><b>Open detail:</b> whether to round per line or per invoice, and how cash rounding is shown on the receipt, depends on tax rules for the chosen business. Decide after the tax question is answered.</div>
+</section>
+
+<!-- ============ DATA MODEL ============ -->
+<section id="data">
+  <h2>Data model (first draft)</h2>
+  <p>Every table also has <code>id</code>, <code>created_at</code> and <code>updated_at</code>. Amount columns hold whole paisa (the suffix <code>_cents</code> is just the common naming convention). Open any table below to see its columns.</p>
+
+  <h3>Relationships at a glance</h3>
+  <div class="diagram">
+    <svg viewBox="0 0 900 450" role="img" aria-label="Relationships between main tables">
+      <!-- catalog -->
+      <rect class="box a" x="20" y="20" width="150" height="44" rx="8"/><text x="34" y="40">categories</text><text class="s" x="34" y="56">groups products</text>
+      <rect class="box a" x="250" y="20" width="150" height="44" rx="8"/><text x="264" y="40">products</text><text class="s" x="264" y="56">the &ldquo;parent&rdquo; item</text>
+      <rect class="box a" x="480" y="20" width="150" height="44" rx="8"/><text x="494" y="40">units</text><text class="s" x="494" y="56">pcs, kg, dozen</text>
+      <rect class="box a" x="710" y="20" width="150" height="44" rx="8"/><text x="724" y="40">tax_rates</text><text class="s" x="724" y="56">e.g. 18%</text>
+      <path class="ln" d="M170 42 H250"/>
+      <path class="ln" d="M480 42 H400"/>
+      <path class="ln" d="M785 20 V6 H325 V20"/>
+      <rect class="box a" x="250" y="130" width="150" height="44" rx="8"/><text x="264" y="150">product_variants</text><text class="s" x="264" y="166">price, barcode, stock</text>
+      <path class="ln" d="M325 64 V130"/>
+      <rect class="box g" x="20" y="130" width="150" height="44" rx="8"/><text x="34" y="150">stock_movements</text><text class="s" x="34" y="166">stock ledger</text>
+      <path class="ln" d="M250 152 H170"/>
+      <!-- selling -->
+      <rect class="box g" x="480" y="130" width="150" height="44" rx="8"/><text x="494" y="150">sale_items</text><text class="s" x="494" y="166">price snapshots</text>
+      <path class="ln" d="M480 152 H400"/>
+      <rect class="box g" x="480" y="250" width="150" height="44" rx="8"/><text x="494" y="270">sales</text><text class="s" x="494" y="286">receipt_no, totals</text>
+      <path class="ln" d="M555 250 V174"/>
+      <rect class="box g" x="710" y="250" width="150" height="44" rx="8"/><text x="724" y="270">payments</text><text class="s" x="724" y="286">cash, card, wallet</text>
+      <path class="ln" d="M630 272 H710"/>
+      <rect class="box" x="710" y="130" width="150" height="44" rx="8"/><text x="724" y="150">customers</text><text class="s" x="724" y="166">later phase</text>
+      <path class="ln d" d="M785 174 V215 H600 V250"/>
+      <rect class="box y" x="250" y="250" width="150" height="44" rx="8"/><text x="264" y="270">shifts</text><text class="s" x="264" y="286">cash drawer sessions</text>
+      <path class="ln" d="M400 272 H480"/>
+      <rect class="box" x="20" y="250" width="150" height="44" rx="8"/><text x="34" y="270">users</text><text class="s" x="34" y="286">admin, manager, cashier</text>
+      <path class="ln" d="M170 272 H250"/>
+      <rect class="box y" x="480" y="370" width="150" height="44" rx="8"/><text x="494" y="390">refunds</text><text class="s" x="494" y="406">partial or full</text>
+      <path class="ln" d="M555 294 V370"/>
+      <rect class="box y" x="710" y="370" width="150" height="44" rx="8"/><text x="724" y="390">refund_items</text><text class="s" x="724" y="406">items given back</text>
+      <path class="ln" d="M630 392 H710"/>
+      <rect class="box" x="20" y="370" width="150" height="44" rx="8"/><text x="34" y="390">audit_logs</text><text class="s" x="34" y="406">who did what</text>
+      <path class="ln d" d="M95 370 V294"/>
+    </svg>
+  </div>
+  <p class="eyebrow">Blue = catalog · Green = selling and stock · Yellow = money control · Dashed = optional or later</p>
+
+  <h3>Tables</h3>
+  <div class="dm">
+
+  <details><summary><code>users</code><span class="sub">who can log in</span></summary><div class="in"><div class="tbl"><table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>name</td><td>text</td><td></td></tr>
+    <tr><td>email</td><td>text, unique</td><td>Used to log in</td></tr>
+    <tr><td>password</td><td>text</td><td>Hashed by Laravel, never stored as plain text</td></tr>
+    <tr><td>role</td><td>enum</td><td><code>admin</code>, <code>manager</code>, <code>cashier</code></td></tr>
+    <tr><td>is_active</td><td>boolean</td><td>Disable a person without deleting history</td></tr></tbody></table></div></div></details>
+
+  <details><summary><code>settings</code><span class="sub">shop-wide options</span></summary><div class="in"><div class="tbl"><table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>key</td><td>text, unique</td><td>For example <code>shop_name</code>, <code>currency</code>, <code>tax_mode</code>, <code>cash_rounding</code>, <code>receipt_footer</code></td></tr>
+    <tr><td>value</td><td>json</td><td></td></tr></tbody></table></div></div></details>
+
+  <details><summary><code>categories</code><span class="sub">product groups</span></summary><div class="in"><div class="tbl"><table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>name</td><td>text</td><td>Optionally also an Urdu name</td></tr>
+    <tr><td>parent_id</td><td>foreign key, nullable</td><td>Allows sub-categories</td></tr></tbody></table></div></div></details>
+
+  <details><summary><code>tax_rates</code><span class="sub">e.g. 18%, 0%, exempt</span></summary><div class="in"><div class="tbl"><table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>name</td><td>text</td><td>&ldquo;Standard GST&rdquo;, &ldquo;Exempt&rdquo;</td></tr>
+    <tr><td>rate_bps</td><td>integer</td><td>Basis points: 1800 means 18.00%</td></tr>
+    <tr><td>is_active</td><td>boolean</td><td></td></tr></tbody></table></div></div></details>
+
+  <details><summary><code>units</code><span class="sub">piece, kg, g, litre, dozen</span></summary><div class="in"><div class="tbl"><table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>code</td><td>text, unique</td><td><code>pcs</code>, <code>kg</code>, <code>g</code>, <code>l</code>, <code>dozen</code>, <code>m</code></td></tr>
+    <tr><td>name</td><td>text</td><td>Display name</td></tr>
+    <tr><td>allows_decimal</td><td>boolean</td><td>False for pieces, true for kg and litres. Controls what the checkout screen lets you type.</td></tr></tbody></table></div></div></details>
+
+  <details><summary><code>products</code><span class="sub">the parent item, e.g. &ldquo;Cotton T-shirt&rdquo;</span></summary><div class="in"><div class="tbl"><table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>category_id</td><td>foreign key</td><td></td></tr>
+    <tr><td>name</td><td>text</td><td></td></tr>
+    <tr><td>name_ur</td><td>text, nullable</td><td>Urdu name if we support it</td></tr>
+    <tr><td>unit_id</td><td>foreign key</td><td>How it is sold: pieces, kg, and so on. Price is per this unit.</td></tr>
+    <tr><td>tax_rate_id</td><td>foreign key, nullable</td><td></td></tr>
+    <tr><td>track_stock</td><td>boolean</td><td>False for services or items you never count</td></tr>
+    <tr><td>is_active</td><td>boolean</td><td>Soft deletes also used</td></tr></tbody></table></div></div></details>
+
+  <details><summary><code>product_variants</code><span class="sub">the thing actually sold and counted</span></summary><div class="in"><p>Every product has <b>at least one variant</b>. A simple product (a 1 kg bag of sugar) has a single variant named &ldquo;Default&rdquo;. A T-shirt has one per size and colour. This keeps the selling code identical for both cases.</p><div class="tbl"><table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>product_id</td><td>foreign key</td><td></td></tr>
+    <tr><td>name</td><td>text</td><td>&ldquo;Default&rdquo; or &ldquo;Red / M&rdquo;</td></tr>
+    <tr><td>attributes</td><td>json</td><td>For example <code>{"size":"M","colour":"Red"}</code></td></tr>
+    <tr><td>sku</td><td>text, unique</td><td>Internal code</td></tr>
+    <tr><td>barcode</td><td>text, unique, nullable</td><td>What the scanner reads</td></tr>
+    <tr><td>price_cents</td><td>integer</td><td>Per unit (per kg for weighed items)</td></tr>
+    <tr><td>cost_cents</td><td>integer</td><td>For profit reports</td></tr>
+    <tr><td>stock_qty</td><td>numeric(12,3)</td><td>Cached total of stock movements</td></tr>
+    <tr><td>reorder_level</td><td>numeric(12,3)</td><td>For the low-stock list</td></tr>
+    <tr><td>is_active</td><td>boolean</td><td></td></tr></tbody></table></div></div></details>
+
+  <details><summary><code>stock_movements</code><span class="sub">the stock ledger</span></summary><div class="in"><div class="tbl"><table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>variant_id</td><td>foreign key</td><td></td></tr>
+    <tr><td>type</td><td>enum</td><td><code>sale</code>, <code>refund</code>, <code>void</code>, <code>purchase</code>, <code>adjustment</code>, <code>initial</code></td></tr>
+    <tr><td>quantity</td><td>numeric(12,3)</td><td>Signed: negative means stock went out</td></tr>
+    <tr><td>reference_type, reference_id</td><td>morph</td><td>Points at the sale, refund or purchase that caused it</td></tr>
+    <tr><td>user_id</td><td>foreign key</td><td>Who did it</td></tr>
+    <tr><td>note</td><td>text, nullable</td><td>Required for manual adjustments</td></tr></tbody></table></div></div></details>
+
+  <details><summary><code>shifts</code><span class="sub">cash drawer sessions</span></summary><div class="in"><div class="tbl"><table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>user_id</td><td>foreign key</td><td>The cashier</td></tr>
+    <tr><td>opened_at, closed_at</td><td>timestamp</td><td></td></tr>
+    <tr><td>opening_cash_cents</td><td>integer</td><td>Counted when the shift opens</td></tr>
+    <tr><td>expected_cash_cents</td><td>integer</td><td>Opening + cash sales − cash refunds</td></tr>
+    <tr><td>counted_cash_cents</td><td>integer</td><td>Counted when the shift closes</td></tr>
+    <tr><td>note</td><td>text, nullable</td><td>Reason for any difference</td></tr></tbody></table></div></div></details>
+
+  <details><summary><code>sales</code><span class="sub">one row per completed sale</span></summary><div class="in"><div class="tbl"><table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>receipt_no</td><td>text, unique</td><td>Sequential, no gaps allowed</td></tr>
+    <tr><td>shift_id, user_id</td><td>foreign keys</td><td>Which shift and cashier</td></tr>
+    <tr><td>customer_id</td><td>foreign key, nullable</td><td>Optional</td></tr>
+    <tr><td>status</td><td>enum</td><td><code>completed</code> or <code>voided</code></td></tr>
+    <tr><td>subtotal_cents, discount_cents, tax_cents, rounding_cents, total_cents</td><td>integer</td><td>All computed by the server</td></tr>
+    <tr><td>idempotency_key</td><td>text, unique</td><td>Stops duplicate submissions</td></tr>
+    <tr><td>voided_by, void_reason</td><td>nullable</td><td>Only set when voided</td></tr></tbody></table></div></div></details>
+
+  <details><summary><code>sale_items</code><span class="sub">lines of a sale, with snapshots</span></summary><div class="in"><div class="tbl"><table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>sale_id, variant_id</td><td>foreign keys</td><td></td></tr>
+    <tr><td>product_name, variant_name, unit_code</td><td>text</td><td>Snapshots of what the item was called at the time</td></tr>
+    <tr><td>unit_price_cents</td><td>integer</td><td>Snapshot of the price at the time</td></tr>
+    <tr><td>quantity</td><td>numeric(12,3)</td><td>Whole or decimal</td></tr>
+    <tr><td>discount_cents, tax_cents, line_total_cents</td><td>integer</td><td></td></tr></tbody></table></div></div></details>
+
+  <details><summary><code>payments</code><span class="sub">how the sale was paid</span></summary><div class="in"><div class="tbl"><table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>sale_id</td><td>foreign key</td><td>A sale can have several payments (split payment)</td></tr>
+    <tr><td>method</td><td>enum</td><td><code>cash</code>, <code>card</code>, <code>bank_transfer</code>, <code>wallet</code>, <code>other</code> (later <code>credit</code>)</td></tr>
+    <tr><td>amount_cents</td><td>integer</td><td>Amount applied to the sale</td></tr>
+    <tr><td>tendered_cents, change_cents</td><td>integer</td><td>Cash handed over and change returned</td></tr>
+    <tr><td>reference</td><td>text, nullable</td><td>Card slip number, transfer ID, wallet transaction ID</td></tr></tbody></table></div></div></details>
+
+  <details><summary><code>refunds</code> and <code>refund_items</code><span class="sub">returning goods and money</span></summary><div class="in"><div class="tbl"><table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>refunds.sale_id, user_id</td><td>foreign keys</td><td></td></tr>
+    <tr><td>refunds.reason</td><td>text</td><td>Required</td></tr>
+    <tr><td>refunds.total_cents</td><td>integer</td><td></td></tr>
+    <tr><td>refund_items.refund_id, sale_item_id</td><td>foreign keys</td><td></td></tr>
+    <tr><td>refund_items.quantity, amount_cents</td><td>numeric / integer</td><td>Partial refunds allowed, including part of a weighed quantity</td></tr></tbody></table></div></div></details>
+
+  <details><summary><code>customers</code>, <code>suppliers</code>, <code>purchases</code>, <code>audit_logs</code><span class="sub">later phases</span></summary><div class="in"><div class="tbl"><table>
+    <thead><tr><th>Table</th><th>Main columns</th></tr></thead><tbody>
+    <tr><td>customers</td><td>name, phone, email, credit_limit_cents, balance_cents (for udhaar later)</td></tr>
+    <tr><td>suppliers</td><td>name, phone, notes</td></tr>
+    <tr><td>purchases, purchase_items</td><td>supplier_id, received_at, variant_id, quantity, cost_cents (receiving stock)</td></tr>
+    <tr><td>audit_logs</td><td>user_id, action, subject_type, subject_id, before (json), after (json)</td></tr></tbody></table></div></div></details>
+
+  </div>
+</section>
+
+<!-- ============ VARIANTS ============ -->
+<section id="variants">
+  <h2>Variants and weighted items</h2>
+  <p>Both are <b>decided as needed</b>, and both change the database design, so they are built in from the start rather than bolted on.</p>
+  <div class="grid g2">
+    <div class="card"><h4>Weighted and loose items</h4>
+      <ul>
+        <li>Each product has a <b>unit</b> (pcs, kg, g, litre, dozen). The price is per that unit, for example Rs 480 per kg.</li>
+        <li>Units say whether decimals are allowed. Pieces: whole numbers only. Kilograms: three decimals (grams).</li>
+        <li>The cashier types or enters the weight. A connected scale can come later.</li>
+        <li>Stock and sales quantities are <code>numeric(12,3)</code>.</li>
+        <li>Refunding part of a weighed item (0.5 kg of 1.25 kg) is allowed.</li>
+      </ul></div>
+    <div class="card"><h4>Variants</h4>
+      <ul>
+        <li>A <b>product</b> is the idea (&ldquo;Cotton T-shirt&rdquo;). A <b>variant</b> is the sellable thing (&ldquo;Red / M&rdquo;).</li>
+        <li>Price, barcode, SKU and stock are stored on the variant.</li>
+        <li>Every product has at least one variant. A simple product has a single &ldquo;Default&rdquo; variant, so checkout code is the same for everything.</li>
+        <li>Sales and stock always refer to the <b>variant</b>.</li>
+      </ul></div>
+  </div>
+  <h3>Example</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Product</th><th>Unit</th><th>Variant</th><th>Barcode</th><th>Price</th><th>Stock</th></tr></thead>
+    <tbody>
+      <tr><td>Basmati rice (loose)</td><td>kg</td><td>Default</td><td>—</td><td>Rs 480.00 per kg</td><td>85.500 kg</td></tr>
+      <tr><td>Cooking oil</td><td>litre</td><td>1 L bottle</td><td>8961234567890</td><td>Rs 620.00</td><td>40.000</td></tr>
+      <tr><td>Cooking oil</td><td>litre</td><td>5 L tin</td><td>8961234567906</td><td>Rs 3,050.00</td><td>12.000</td></tr>
+      <tr><td>Cotton T-shirt</td><td>pcs</td><td>Red / M</td><td>8960000000011</td><td>Rs 1,200.00</td><td>6</td></tr>
+      <tr><td>Cotton T-shirt</td><td>pcs</td><td>Red / L</td><td>8960000000028</td><td>Rs 1,200.00</td><td>0 (blocked at checkout)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="banner info"><b>Later idea:</b> some shops use scale-printed barcodes that already contain the weight or price. We can support that after version 1 by reading the barcode prefix. It needs no schema change.</div>
+</section>
+
+<!-- ============ FLOWS ============ -->
+<section id="flows">
+  <h2>Key flows</h2>
+
+  <h3>Checkout (the most important flow)</h3>
+  <div class="steps">
+    <div class="step"><div><b>Build the cart in the browser</b><p>Scan, search or tap items. Enter weight for loose items. Nothing is saved yet.</p></div></div>
+    <div class="step"><div><b>Send items and payment to the server</b><p>Only variant IDs, quantities, discounts requested and payments. Plus a unique request key.</p></div></div>
+    <div class="step"><div><b>Server starts a database transaction</b><p>Everything below happens inside it. Any failure cancels the whole thing.</p></div></div>
+    <div class="step"><div><b>Lock and check stock</b><p>Lock the variant rows (<code>lockForUpdate</code>). If any quantity is more than available stock, stop with a clear message. This is the &ldquo;blocked at zero&rdquo; rule.</p></div></div>
+    <div class="step"><div><b>Work out the totals</b><p>Look up current prices, compute line totals, tax, discount, cash rounding. Check the payments cover the total.</p></div></div>
+    <div class="step"><div><b>Write the records</b><p>Create the sale, sale items (with snapshots), payments, stock movements (negative), update cached stock, assign the next receipt number.</p></div></div>
+    <div class="step"><div><b>Commit and show the receipt</b><p>Return the receipt page, open a fresh empty cart. If the same request key arrives again, return the same receipt instead of making a second sale.</p></div></div>
+  </div>
+
+  <h3>Void</h3>
+  <p>Manager only, and only within a configurable window (for example same day). The sale is marked <code>voided</code>, stock is put back through new <code>void</code> movements, and the user and reason are recorded. The original rows stay in place.</p>
+
+  <h3>Refund</h3>
+  <p>Creates a <code>refund</code> with <code>refund_items</code> (partial amounts and partial weights allowed). Returns stock through new movements, records who and why, and records the money paid out in the shift.</p>
+
+  <h3>Shift</h3>
+  <div class="flow">
+    <div class="n"><b>Open</b>Cashier counts the opening cash.</div><span class="arrow">→</span>
+    <div class="n"><b>Trade</b>Cash sales and refunds are tied to the shift.</div><span class="arrow">→</span>
+    <div class="n"><b>Close</b>System shows expected cash. Cashier enters counted cash.</div><span class="arrow">→</span>
+    <div class="n"><b>Difference</b>Stored with a note if there is one.</div>
+  </div>
+
+  <h3>Stock changes</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Event</th><th>Movement type</th><th>Quantity sign</th></tr></thead>
+    <tbody>
+      <tr><td>Sale</td><td><code>sale</code></td><td>negative</td></tr>
+      <tr><td>Refund (goods returned to shelf)</td><td><code>refund</code></td><td>positive</td></tr>
+      <tr><td>Void</td><td><code>void</code></td><td>positive</td></tr>
+      <tr><td>New stock received</td><td><code>purchase</code></td><td>positive</td></tr>
+      <tr><td>Manual correction (damage, count difference)</td><td><code>adjustment</code></td><td>either, note required</td></tr>
+      <tr><td>Starting stock when the shop begins using the system</td><td><code>initial</code></td><td>positive</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ SALE EXAMPLE ============ -->
+<section id="sale-example">
+  <h2>A sale, row by row</h2>
+  <p>The best way to understand the data model is to follow one real sale. A customer buys <b>1.250 kg of rice</b>, <b>2 bottles of cooking oil</b> and <b>1 kg of sugar</b>, pays cash, and the prices are tax-exclusive with 18% tax. Amounts below are stored in paisa (Rs 1 = 100).</p>
+
+  <h3>1. The sale</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>receipt_no</th><th>status</th><th>subtotal_cents</th><th>discount_cents</th><th>tax_cents</th><th>rounding_cents</th><th>total_cents</th></tr></thead>
+    <tbody><tr><td>0001</td><td>completed</td><td>200000</td><td>0</td><td>36000</td><td>0</td><td><b>236000</b> (Rs 2,360.00)</td></tr></tbody>
+  </table></div>
+
+  <h3>2. The sale items (with price snapshots)</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Item (snapshot)</th><th>unit</th><th>unit_price_cents</th><th>quantity</th><th>line_total_cents</th><th>tax_cents</th></tr></thead>
+    <tbody>
+      <tr><td>Basmati rice / Default</td><td>kg</td><td>48000</td><td>1.250</td><td>60000</td><td>10800</td></tr>
+      <tr><td>Cooking oil / 1 L bottle</td><td>l</td><td>62000</td><td>2.000</td><td>124000</td><td>22320</td></tr>
+      <tr><td>Sugar / 1 kg</td><td>pcs</td><td>16000</td><td>1.000</td><td>16000</td><td>2880</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>3. The payment</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>method</th><th>amount_cents</th><th>tendered_cents</th><th>change_cents</th></tr></thead>
+    <tbody><tr><td>cash</td><td>236000</td><td>250000 (Rs 2,500.00)</td><td>14000 (Rs 140.00)</td></tr></tbody>
+  </table></div>
+
+  <h3>4. The stock movements (and the cached stock)</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Variant</th><th>type</th><th>quantity</th><th>stock before</th><th>stock after</th></tr></thead>
+    <tbody>
+      <tr><td>Basmati rice / Default</td><td>sale</td><td>−1.250</td><td>85.500</td><td>84.250</td></tr>
+      <tr><td>Cooking oil / 1 L bottle</td><td>sale</td><td>−2.000</td><td>40.000</td><td>38.000</td></tr>
+      <tr><td>Sugar / 1 kg</td><td>sale</td><td>−1.000</td><td>25.000</td><td>24.000</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="banner ok"><b>Why this design works:</b> all four steps are written in one transaction. The receipt can be reprinted years later and will show the same prices even if the rice price changes tomorrow. If the shop had only 1.000 kg of rice, step 4 would have blocked the sale before anything was saved.</div>
+</section>
+
+<!-- ============ ROLES ============ -->
+<section id="roles">
+  <h2>Roles and permissions</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Action</th><th class="c">Cashier</th><th class="c">Manager</th><th class="c">Admin</th></tr></thead>
+    <tbody>
+      <tr><td>Make a sale, print receipt</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+      <tr><td>Open and close own shift</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+      <tr><td>Small discount (under the limit)</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+      <tr><td>Large discount (over the limit)</td><td class="c no">–</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+      <tr><td>Void a sale, refund</td><td class="c no">–</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+      <tr><td>Create and edit products, variants, prices</td><td class="c no">–</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+      <tr><td>Adjust stock</td><td class="c no">–</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+      <tr><td>View reports</td><td class="c">own shift only</td><td class="c yes">✓</td><td class="c yes">✓</td></tr>
+      <tr><td>Manage users and settings</td><td class="c no">–</td><td class="c no">–</td><td class="c yes">✓</td></tr>
+    </tbody>
+  </table></div>
+  <p>Permissions are enforced on the server with Laravel Policies. Hiding a button in the screen is a convenience, never the protection.</p>
+</section>
+
+<!-- ============ SCREENS ============ -->
+<section id="screens">
+  <h2>Screens</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Screen</th><th>Who</th><th>Phase</th></tr></thead>
+    <tbody>
+      <tr><td>Login</td><td>Everyone</td><td>1</td></tr>
+      <tr><td>Checkout</td><td>Cashier, manager</td><td>1</td></tr>
+      <tr><td>Products and variants list / edit</td><td>Manager, admin</td><td>1 (basic), 2 (variants editor)</td></tr>
+      <tr><td>Stock levels and adjustments</td><td>Manager, admin</td><td>1</td></tr>
+      <tr><td>Sales history and receipt view</td><td>Cashier (own), manager</td><td>1</td></tr>
+      <tr><td>Shift open and close</td><td>Cashier</td><td>2</td></tr>
+      <tr><td>Void and refund</td><td>Manager</td><td>2</td></tr>
+      <tr><td>Reports</td><td>Manager, admin</td><td>2</td></tr>
+      <tr><td>Users and settings</td><td>Admin</td><td>1 (users), 2 (settings)</td></tr>
+      <tr><td>Customers, suppliers, receiving stock</td><td>Manager</td><td>3</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Sketch: checkout screen</h3>
+  <p>A rough layout to react to, not a design. The search box is always focused, so a barcode scanner (which types like a keyboard) works immediately.</p>
+  <div class="wire" aria-label="Checkout screen sketch">
+    <div class="bar"><span>POS · Checkout</span><span style="margin-left:auto">Cashier: Ali · Shift open 09:02</span></div>
+    <div class="body">
+      <div class="l">
+        <div class="search">🔍 Scan barcode or search by name / SKU…</div>
+        <div class="chips"><span class="chip">All</span><span class="chip">Grocery</span><span class="chip">Clothing</span><span class="chip">Drinks</span><span class="chip">Loose items</span></div>
+        <div class="tiles">
+          <div class="tile"><b>Basmati rice</b><span>Rs 480 / kg</span></div>
+          <div class="tile"><b>Cooking oil 1 L</b><span>Rs 620</span></div>
+          <div class="tile"><b>Cooking oil 5 L</b><span>Rs 3,050</span></div>
+          <div class="tile"><b>Sugar 1 kg</b><span>Rs 160</span></div>
+          <div class="tile"><b>T-shirt Red / M</b><span>Rs 1,200</span></div>
+          <div class="tile"><b>T-shirt Red / L</b><span>Out of stock</span></div>
+        </div>
+      </div>
+      <div class="r">
+        <div class="line"><span>Basmati rice<br><small>1.250 kg × Rs 480</small></span><span>600.00</span></div>
+        <div class="line"><span>Cooking oil 1 L<br><small>2 × Rs 620</small></span><span>1,240.00</span></div>
+        <div class="line"><span>Sugar 1 kg<br><small>1 × Rs 160</small></span><span>160.00</span></div>
+        <div class="line"><span>Subtotal</span><span>2,000.00</span></div>
+        <div class="line"><span>Tax (18%)</span><span>360.00</span></div>
+        <div class="line t"><span>Total</span><span>Rs 2,360.00</span></div>
+        <div class="paybtn">Pay (F10)</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Sketch: product with variants</h3>
+  <div class="wire" aria-label="Product editor sketch">
+    <div class="bar"><span>Products · Cotton T-shirt</span></div>
+    <div style="padding:12px;display:flex;flex-direction:column;gap:10px">
+      <div class="chips"><span class="chip">Category: Clothing</span><span class="chip">Unit: pcs</span><span class="chip">Tax: Standard 18%</span><span class="chip">Track stock: yes</span></div>
+      <div class="tbl"><table>
+        <thead><tr><th>Variant</th><th>SKU</th><th>Barcode</th><th>Price</th><th>Stock</th></tr></thead>
+        <tbody>
+          <tr><td>Red / M</td><td>TS-R-M</td><td>8960000000011</td><td>1,200.00</td><td>6</td></tr>
+          <tr><td>Red / L</td><td>TS-R-L</td><td>8960000000028</td><td>1,200.00</td><td>0</td></tr>
+          <tr><td>Blue / M</td><td>TS-B-M</td><td>8960000000035</td><td>1,250.00</td><td>9</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <h3>Reports (Phase 2)</h3>
+  <div class="grid g3">
+    <div class="card"><h4>Daily sales</h4><p>Total sales, tax, discounts, payment method split.</p></div>
+    <div class="card"><h4>By cashier and shift</h4><p>Who sold what, cash differences.</p></div>
+    <div class="card"><h4>Best sellers</h4><p>Top variants by quantity and by revenue.</p></div>
+    <div class="card"><h4>Low stock</h4><p>Variants below their reorder level.</p></div>
+    <div class="card"><h4>Stock movements</h4><p>Full trail for any item.</p></div>
+    <div class="card"><h4>Profit</h4><p>Revenue minus cost, per item and per day.</p></div>
+  </div>
+</section>
+
+<!-- ============ HARDWARE ============ -->
+<section id="hardware">
+  <h2>Hardware and running it for real</h2>
+  <div class="grid g2">
+    <div class="card"><h4>Barcode scanner</h4><p>Most USB scanners act like a keyboard that types the number and presses Enter. They work in a browser with no extra software. We only need an always-focused search box.</p></div>
+    <div class="card"><h4>Receipts</h4><p>Start with a print-friendly receipt page (browser print dialog, CSS sized for 80 mm paper). Direct thermal-printer commands (ESC/POS) can come later if needed.</p></div>
+    <div class="card"><h4>Weighing scale</h4><p>Version 1: the cashier types the weight. Later: read a connected scale or scale-printed barcodes.</p></div>
+    <div class="card"><h4>Cash drawer and card terminal</h4><p>Out of scope for now. Terminals usually involve fees, which conflicts with the zero-budget rule, so cards are recorded manually with a reference number.</p></div>
+  </div>
+  <h3>Running it in a real shop (later)</h3>
+  <ul>
+    <li><b>Easiest and free:</b> install Laravel and PostgreSQL on <b>one PC in the shop</b>. Other devices on the same network open the app in a browser. No internet needed.</li>
+    <li><b>Free hosting tiers</b> exist but are limited and change often. Check current limits before relying on one, and do not put real customer data on a service you have not reviewed.</li>
+    <li><b>Backups are mandatory</b> before real use: a scheduled <code>pg_dump</code> to another drive (and ideally a USB copy kept off-site), plus a tested restore.</li>
+    <li><b>Use a UPS</b> on the shop PC because of power cuts.</li>
+  </ul>
+</section>
+
+<!-- ============ ROADMAP ============ -->
+<section id="roadmap">
+  <h2>Roadmap</h2>
+  <div class="banner">Phases are in order but not dated. Add dates once you know how many hours per week each of you can give. Sizes are rough guesses only. Tick boxes are saved in your browser.</div>
+
+  <div class="phase" data-phase="p0">
+    <header><h3>Phase 0: Foundation <span class="pill p-info">Small</span></h3><span class="pbar"><i></i></span><span class="ptxt"></span></header>
+    <p class="goal"><b>Goal:</b> both of us can run the same empty app locally and ship a change through a pull request.</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-id="p0a"><span>Agree the open questions (business type, tax, frontend)</span></label></li>
+      <li><label><input type="checkbox" data-id="p0b"><span>Install PHP, Composer, PostgreSQL, Node on both machines</span></label></li>
+      <li><label><input type="checkbox" data-id="p0c"><span>Create the Laravel project in this repo with the chosen frontend starter kit</span></label></li>
+      <li><label><input type="checkbox" data-id="p0d"><span>Connect PostgreSQL; commit <code>.env.example</code>, ignore <code>.env</code></span></label></li>
+      <li><label><input type="checkbox" data-id="p0e"><span>Write README setup steps (clone to running in under 10 minutes)</span></label></li>
+      <li><label><input type="checkbox" data-id="p0f"><span>Add Pest and Laravel Pint</span></label></li>
+      <li><label><input type="checkbox" data-id="p0g"><span>Add GitHub Actions: run tests and Pint on every pull request</span></label></li>
+      <li><label><input type="checkbox" data-id="p0h"><span>Create GitHub Milestones and Issues for Phase 1</span></label></li>
+      <li><label><input type="checkbox" data-id="p0i"><span>Agree branch and pull request workflow</span></label></li>
+    </ul>
+    <div class="done"><b>Done when:</b> a fresh clone runs on both machines, CI is green, and each of us has had one pull request reviewed and merged.</div>
+  </div>
+
+  <div class="phase" data-phase="p1">
+    <header><h3>Phase 1: MVP, sell something <span class="pill p-warn">Large</span></h3><span class="pbar"><i></i></span><span class="ptxt"></span></header>
+    <p class="goal"><b>Goal:</b> a cashier can log in, sell products (including weighed ones) for cash, and stock goes down.</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-id="p1a"><span>Login, logout, roles (admin and cashier), seeded demo users</span></label></li>
+      <li><label><input type="checkbox" data-id="p1b"><span>Units table (pcs, kg, g, litre, dozen) with decimal rules</span></label></li>
+      <li><label><input type="checkbox" data-id="p1c"><span>Categories, products and a default variant per product (create, edit, deactivate, search)</span></label></li>
+      <li><label><input type="checkbox" data-id="p1d"><span>Barcode and SKU on variants (scanner works as keyboard input)</span></label></li>
+      <li><label><input type="checkbox" data-id="p1e"><span>Tax rates (basic, per product) and tax-inclusive / exclusive setting</span></label></li>
+      <li><label><input type="checkbox" data-id="p1f"><span><code>Money</code> and <code>Quantity</code> helpers with tests for every example in the Money section</span></label></li>
+      <li><label><input type="checkbox" data-id="p1g"><span>Checkout screen: search/scan, cart, quantity and weight entry, totals</span></label></li>
+      <li><label><input type="checkbox" data-id="p1h"><span>Cash payment with tendered amount, change and cash rounding</span></label></li>
+      <li><label><input type="checkbox" data-id="p1i"><span><code>CompleteSale</code> action: one transaction, price snapshots, stock check with locking, receipt number</span></label></li>
+      <li><label><input type="checkbox" data-id="p1j"><span>Block the sale when stock is zero or too low, with a clear message</span></label></li>
+      <li><label><input type="checkbox" data-id="p1k"><span>Double-submit protection (idempotency key)</span></label></li>
+      <li><label><input type="checkbox" data-id="p1l"><span>Printable receipt page (80 mm layout)</span></label></li>
+      <li><label><input type="checkbox" data-id="p1m"><span>Stock ledger and manual stock adjustment (admin)</span></label></li>
+      <li><label><input type="checkbox" data-id="p1n"><span>Sales list and receipt lookup</span></label></li>
+      <li><label><input type="checkbox" data-id="p1o"><span>Feature tests for checkout, stock deduction, blocking at zero, rounding</span></label></li>
+    </ul>
+    <div class="done"><b>Done when:</b> we can run a pretend shop day with seeded products: sell items and weights, print receipts, see correct stock afterwards, and the automated tests prove the totals.</div>
+  </div>
+
+  <div class="phase" data-phase="p2">
+    <header><h3>Phase 2: Run a shop day <span class="pill p-warn">Large</span></h3><span class="pbar"><i></i></span><span class="ptxt"></span></header>
+    <p class="goal"><b>Goal:</b> the things a manager needs to trust the system at closing time.</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-id="p2a"><span>Manager role and permission policies</span></label></li>
+      <li><label><input type="checkbox" data-id="p2b"><span>Variants editor: several variants per product, attributes, per-variant price and stock</span></label></li>
+      <li><label><input type="checkbox" data-id="p2c"><span>Shifts: open with cash, close with counted cash and difference</span></label></li>
+      <li><label><input type="checkbox" data-id="p2d"><span>Void and refund flows (reasons, who, stock reversal, partial refunds and partial weights)</span></label></li>
+      <li><label><input type="checkbox" data-id="p2e"><span>Discounts (line and order level) with a limit that needs a manager above it</span></label></li>
+      <li><label><input type="checkbox" data-id="p2f"><span>Reports: daily sales, by cashier, best sellers, low stock, shift summary</span></label></li>
+      <li><label><input type="checkbox" data-id="p2g"><span>CSV export of reports (useful for an accountant)</span></label></li>
+      <li><label><input type="checkbox" data-id="p2h"><span>Audit log for sensitive actions</span></label></li>
+      <li><label><input type="checkbox" data-id="p2i"><span>Low-stock alerts on the dashboard</span></label></li>
+      <li><label><input type="checkbox" data-id="p2j"><span>Settings page (shop name, currency, receipt header and footer, rounding)</span></label></li>
+    </ul>
+    <div class="done"><b>Done when:</b> a manager can open a shift, let a cashier trade, handle a refund, close the shift and see a report whose numbers match the cash in the drawer.</div>
+  </div>
+
+  <div class="phase" data-phase="p3">
+    <header><h3>Phase 3: Real-world polish <span class="pill p-warn">Medium to large</span></h3><span class="pbar"><i></i></span><span class="ptxt"></span></header>
+    <p class="goal"><b>Goal:</b> comfortable and safe enough for an actual small shop.</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-id="p3a"><span>Split payments and card / bank transfer / wallet recorded with reference numbers</span></label></li>
+      <li><label><input type="checkbox" data-id="p3b"><span>Customers: optional link to a sale, purchase history</span></label></li>
+      <li><label><input type="checkbox" data-id="p3c"><span>Customer credit (udhaar) ledger, if the chosen shop needs it</span></label></li>
+      <li><label><input type="checkbox" data-id="p3d"><span>Suppliers and receiving stock (simple purchase entries)</span></label></li>
+      <li><label><input type="checkbox" data-id="p3e"><span>Urdu names and bilingual receipts, if needed</span></label></li>
+      <li><label><input type="checkbox" data-id="p3f"><span>FBR POS integration, if the chosen business requires it (research first)</span></label></li>
+      <li><label><input type="checkbox" data-id="p3g"><span>Keyboard shortcuts for fast checkout</span></label></li>
+      <li><label><input type="checkbox" data-id="p3h"><span>Hold and resume a cart</span></label></li>
+      <li><label><input type="checkbox" data-id="p3i"><span><b>Automatic database backups</b> and a tested restore</span></label></li>
+      <li><label><input type="checkbox" data-id="p3j"><span>Owner documentation: install, daily use, backup and restore</span></label></li>
+      <li><label><input type="checkbox" data-id="p3k"><span>Pilot with one real shop or friendly tester, collect feedback</span></label></li>
+    </ul>
+    <div class="done"><b>Done when:</b> a real shop can use it for a full week without us touching the code, and a backup has been restored successfully at least once.</div>
+  </div>
+
+  <div class="phase" data-phase="p4">
+    <header><h3>Phase 4: Later and ideas <span class="pill p-mute">Not committed</span></h3></header>
+    <p class="goal">Revisit once Phase 3 is done.</p>
+    <ul>
+      <li>Loyalty points and promotions</li>
+      <li>Multiple branches</li>
+      <li>Direct thermal printer support (ESC/POS) and cash drawer kick</li>
+      <li>Scale integration and scale-printed barcodes</li>
+      <li>Tablet and touch-friendly layout</li>
+      <li>Offline-capable mode</li>
+      <li>Remote access or hosting, only if a free and trustworthy option exists</li>
+      <li>Online payment integrations (usually have fees)</li>
+      <li>Expiry dates and batch tracking (useful for food and medicine)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ SPLIT ============ -->
+<section id="split">
+  <h2>Suggested work split</h2>
+  <p>To avoid both of you editing the same files at the same time. Confirm with Hashim, and swap per phase if you want to learn both sides.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Area</th><th>Owner (proposal)</th></tr></thead>
+    <tbody>
+      <tr><td>Database design, migrations, <code>CompleteSale</code>, stock and refund Actions, tests</td><td>Person A (backend)</td></tr>
+      <tr><td>Checkout and back-office screens (Vue/React/Livewire), receipt layout</td><td>Person B (frontend)</td></tr>
+      <tr><td>Reports, settings, CI, documentation</td><td>Shared, picked per issue</td></tr>
+    </tbody>
+  </table></div>
+  <div class="banner info"><b>Golden rule:</b> agree on a table's columns <i>before</i> the screen that uses it is built. Changing a column later breaks the other person's work.</div>
+</section>
+
+<!-- ============ WORKFLOW ============ -->
+<section id="workflow">
+  <h2>Team workflow</h2>
+  <div class="grid g2">
+    <div class="card"><h4>Branches</h4>
+      <ul>
+        <li><code>main</code> is protected. Changes arrive only by pull request.</li>
+        <li><code>develop</code> is the working branch.</li>
+        <li>Make a branch from <code>develop</code>: <code>feature/checkout-screen</code>, <code>fix/rounding</code>, <code>docs/roadmap</code>.</li>
+        <li>Open a pull request into <code>develop</code>.</li>
+      </ul></div>
+    <div class="card"><h4>Pull requests</h4>
+      <ul>
+        <li>Small: one feature or fix per pull request.</li>
+        <li>The other person reviews before merging.</li>
+        <li>Tests and Pint must pass (CI checks this).</li>
+        <li>Describe what changed and how to try it.</li>
+      </ul></div>
+  </div>
+  <h3>Day-to-day commands</h3>
+<pre><code>git switch develop
+git pull
+git switch -c feature/checkout-screen   # new branch
+# ...write code...
+git add .
+git commit -m "Add checkout cart component"
+git push -u origin feature/checkout-screen
+gh pr create --base develop             # open the pull request</code></pre>
+  <h3>Definition of done (for any task)</h3>
+  <ul>
+    <li>It works when you run it locally from a fresh migration and seed.</li>
+    <li>Tests exist for the money, stock and permission parts, and they pass.</li>
+    <li>No secrets, <code>.env</code> or personal data in the diff.</li>
+    <li>These docs are updated if the design changed.</li>
+  </ul>
+</section>
+
+<!-- ============ TESTING ============ -->
+<section id="testing">
+  <h2>Testing</h2>
+  <p>Money and stock bugs cost real money, so tests are not optional here.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>What</th><th>How</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td>Money and quantity maths</td><td>Unit tests</td><td>Every row in the Money section, including awkward rounding</td></tr>
+      <tr><td>Checkout</td><td>Feature tests against PostgreSQL</td><td>Totals, change, receipt numbers, snapshots, rollback when a step fails</td></tr>
+      <tr><td>Stock</td><td>Feature tests</td><td>Sale reduces stock, blocked at zero, refund and void put it back</td></tr>
+      <tr><td>Concurrency</td><td>Targeted test or manual check</td><td>Two requests for the last item: exactly one succeeds</td></tr>
+      <tr><td>Double submit</td><td>Feature test</td><td>Same request key twice creates one sale</td></tr>
+      <tr><td>Permissions</td><td>Feature tests</td><td>Cashier cannot refund, void or adjust stock</td></tr>
+      <tr><td>Screens</td><td>Manual checks first</td><td>Walk through the checkout with a scanner and keyboard only</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ RISKS ============ -->
+<section id="risks">
+  <h2>Risks to watch</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Risk</th><th>Why it matters</th><th>What we do about it</th></tr></thead>
+    <tbody>
+      <tr><td>Money or weight rounding bugs</td><td>Books never match, customers overcharged</td><td>Integer paisa, exact decimals, one helper, tests with awkward numbers</td></tr>
+      <tr><td>Overselling or lost sales</td><td>Wrong stock, angry customers</td><td>Transactions, row locking, idempotency key</td></tr>
+      <tr><td>Scope creep</td><td>Never reaching version 1</td><td>Anything not in the current phase goes to Phase 4 first</td></tr>
+      <tr><td>Business type decided late</td><td>Redesigning tables and screens</td><td>Decide before Phase 1; keep schema generic until then</td></tr>
+      <tr><td>FBR or tax requirements discovered late</td><td>Large unplanned work</td><td>Research requirements for the chosen business now</td></tr>
+      <tr><td>Two local setups drift apart</td><td>&ldquo;Works on my machine&rdquo;</td><td>Migrations and seeders, documented setup, CI</td></tr>
+      <tr><td>Secrets leak in a public repo</td><td>Passwords or customer data exposed</td><td><code>.env</code> ignored, no real data, review diffs</td></tr>
+      <tr><td>Losing real shop data</td><td>Cannot recover from a disk failure or power cut</td><td>Automatic backups and a tested restore before real use</td></tr>
+      <tr><td>Time: two people, other commitments</td><td>Progress stalls</td><td>Small tasks, one issue at a time, clear owners</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ QUESTIONS ============ -->
+<section id="questions">
+  <h2>Open questions</h2>
+  <p>Each has a recommendation so you can accept it or change it.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Question</th><th>Recommendation</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>What kind of business is the target?</td><td>Pick one real shop type you can visit. A general or grocery store fits weighted items and variants well.</td></tr>
+      <tr><td>2</td><td>Which tax setup applies: inclusive or exclusive prices, one rate or several?</td><td>Support several rates and choose inclusive or exclusive in settings. Confirm real rates with an accountant.</td></tr>
+      <tr><td>3</td><td>Must the chosen business integrate with FBR?</td><td>Find out now. If yes, add it to Phase 3 with proper research.</td></tr>
+      <tr><td>4</td><td>One store or several branches?</td><td>One store for version 1.</td></tr>
+      <tr><td>5</td><td>Which frontend?</td><td>What you both know. Otherwise Inertia + Vue.</td></tr>
+      <tr><td>6</td><td>English only, or Urdu too?</td><td>English first; store Urdu names from the start if it is likely to be needed.</td></tr>
+      <tr><td>7</td><td>Will the shop sell on credit (udhaar)?</td><td>Decide once the shop type is known. The design allows it later.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ GLOSSARY ============ -->
+<section id="glossary">
+  <h2>Glossary</h2>
+  <dl class="gl">
+    <dt>POS</dt><dd>Point of Sale. The software at the till where a customer pays.</dd>
+    <dt>SKU</dt><dd>Stock Keeping Unit. A shop's own code for an item or variant.</dd>
+    <dt>Barcode</dt><dd>The number on the product that a scanner reads. Can be printed by the maker or by the shop.</dd>
+    <dt>Variant</dt><dd>One specific sellable version of a product (for example Red, size M).</dd>
+    <dt>Unit</dt><dd>How an item is measured and priced: piece, kilogram, litre, dozen.</dd>
+    <dt>Paisa</dt><dd>One hundredth of a rupee. We store money as whole paisa.</dd>
+    <dt>Ledger</dt><dd>A list where you only add entries, never edit old ones. Used for stock movements.</dd>
+    <dt>Void</dt><dd>Cancel a whole sale because it was a mistake.</dd>
+    <dt>Refund</dt><dd>Give money back for goods returned. Can be partial.</dd>
+    <dt>Shift</dt><dd>One cashier's session at the till, with opening and closing cash counts.</dd>
+    <dt>Tender</dt><dd>The money a customer hands over. Change is tender minus the amount due.</dd>
+    <dt>Tax-inclusive</dt><dd>The shelf price already contains the tax.</dd>
+    <dt>Tax-exclusive</dt><dd>Tax is added on top of the shelf price at checkout.</dd>
+    <dt>GST</dt><dd>General Sales Tax (federal sales tax on goods in Pakistan).</dd>
+    <dt>FBR</dt><dd>Federal Board of Revenue, Pakistan's federal tax authority.</dd>
+    <dt>Udhaar</dt><dd>Selling on credit, with the customer paying later.</dd>
+    <dt>Migration</dt><dd>A file that creates or changes database tables. Shared through Git so both machines match.</dd>
+    <dt>Seeder</dt><dd>A script that fills the database with demo data.</dd>
+    <dt>Transaction</dt><dd>A group of database writes that either all succeed or all fail.</dd>
+    <dt>Idempotency key</dt><dd>A unique ID sent with a request so a repeat does the work only once.</dd>
+    <dt>Eloquent</dt><dd>Laravel's way of working with database tables as PHP objects.</dd>
+    <dt>Inertia</dt><dd>A bridge that lets Laravel serve Vue or React pages without building a separate API.</dd>
+    <dt>Policy</dt><dd>A Laravel class that decides who is allowed to do a given action.</dd>
+    <dt>CI</dt><dd>Continuous Integration. Automatic checks that run on every pull request.</dd>
+    <dt>Pull request (PR)</dt><dd>A proposal to merge your branch into another, reviewed before it lands.</dd>
+    <dt>Milestone</dt><dd>A GitHub grouping of issues, used here for roadmap phases.</dd>
+    <dt>ESC/POS</dt><dd>The command language many thermal receipt printers understand.</dd>
+    <dt>UPS</dt><dd>Uninterruptible power supply: a battery that keeps the PC running through a power cut.</dd>
+  </dl>
+</section>
+
+<!-- ============ LOG ============ -->
+<section id="log">
+  <h2>Decision and change log</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Date</th><th>Entry</th><th>Who</th></tr></thead>
+    <tbody>
+      <tr><td>2026-11-17</td><td>Decided: Laravel + PostgreSQL, web app, PC first</td><td>Team</td></tr>
+      <tr><td>2026-11-17</td><td>Decided: zero budget, GitHub and local environment only</td><td>Team</td></tr>
+      <tr><td>2026-11-17</td><td>Decided: block sales when stock is zero</td><td>Team</td></tr>
+      <tr><td>2026-11-17</td><td>Decided: support weighted items and variants (schema changed: units, product_variants, decimal quantities)</td><td>Team</td></tr>
+      <tr><td>2026-11-17</td><td>Proposed: Pakistan, PKR (not confirmed)</td><td>Team</td></tr>
+      <tr><td>2026-11-17</td><td>Draft v0.1: first Markdown architecture and roadmap</td><td>Proposed, pending review</td></tr>
+      <tr><td>2026-11-17</td><td>Draft v0.2: this HTML page, Pakistan section, variants, weight, rounding examples</td><td>Proposed, pending review</td></tr>
+      <tr><td>2026-11-17</td><td>Draft v0.3: removed trivial open questions, added &ldquo;A sale, row by row&rdquo; and a first-week plan</td><td>Proposed, pending review</td></tr>
+    </tbody>
+  </table></div>
+  <p class="eyebrow">Add a new row here whenever a decision changes.</p>
+</section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var root = document.documentElement;
+
+  /* theme */
+  try{ var t = localStorage.getItem('pos-plan-theme'); if(t){ root.setAttribute('data-theme', t); } }catch(e){}
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    var cur = root.getAttribute('data-theme');
+    if(!cur){ cur = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try{ localStorage.setItem('pos-plan-theme', next); }catch(e){}
+  });
+
+  /* expand all / print */
+  var allDetails = Array.prototype.slice.call(document.querySelectorAll('details'));
+  var expanded = false;
+  var expandBtn = document.getElementById('expandBtn');
+  expandBtn.addEventListener('click', function(){
+    expanded = !expanded;
+    allDetails.forEach(function(d){ d.open = expanded; });
+    expandBtn.textContent = expanded ? 'Collapse all' : 'Expand all';
+  });
+  document.getElementById('printBtn').addEventListener('click', function(){ window.print(); });
+  window.addEventListener('beforeprint', function(){ allDetails.forEach(function(d){ d.open = true; }); });
+
+  /* checkboxes + progress */
+  var KEY = 'pos-plan-checks';
+  var saved = {};
+  try{ saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }catch(e){ saved = {}; }
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox][data-id]'));
+  boxes.forEach(function(b){
+    if(saved[b.getAttribute('data-id')]){ b.checked = true; }
+    b.addEventListener('change', function(){
+      saved[b.getAttribute('data-id')] = b.checked;
+      try{ localStorage.setItem(KEY, JSON.stringify(saved)); }catch(e){}
+      updateProgress();
+    });
+  });
+  function updateProgress(){
+    Array.prototype.forEach.call(document.querySelectorAll('.phase[data-phase]'), function(ph){
+      var inputs = ph.querySelectorAll('input[type=checkbox]');
+      if(!inputs.length){ return; }
+      var done = 0;
+      Array.prototype.forEach.call(inputs, function(i){ if(i.checked){ done++; } });
+      var bar = ph.querySelector('.pbar i');
+      var txt = ph.querySelector('.ptxt');
+      if(bar){ bar.style.width = Math.round(done / inputs.length * 100) + '%'; }
+      if(txt){ txt.textContent = done + ' / ' + inputs.length; }
+    });
+  }
+  updateProgress();
+
+  /* scroll spy */
+  var links = {};
+  Array.prototype.forEach.call(document.querySelectorAll('nav.toc a[href^="#"]'), function(a){
+    links[a.getAttribute('href').slice(1)] = a;
+  });
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){
+          Object.keys(links).forEach(function(k){ links[k].classList.remove('active'); });
+          var l = links[en.target.id];
+          if(l){ l.classList.add('active'); }
+        }
+      });
+    }, {rootMargin:'-10% 0px -80% 0px'});
+    Array.prototype.forEach.call(document.querySelectorAll('main > section[id]'), function(s){ io.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>
