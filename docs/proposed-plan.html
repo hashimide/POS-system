@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POS System: Proposed Plan</title>
+<style>
+:root{--bg:#f6f7f9;--surface:#fff;--raised:#eef0f4;--line:#dde1e7;--ink:#12161d;--body:#2a313b;--mute:#657083;--accent:#3857d6;
+--ok:#14733a;--okbg:#e1f5e8;--warn:#8a5a00;--warnbg:#fff2d2;--info:#2b44a8;--infobg:#e6ebff}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1015;--surface:#151a21;--raised:#1c222b;--line:#2b3340;--ink:#f0f3f8;--body:#c6cedb;--mute:#8892a2;--accent:#8ea3ff;
+--ok:#4cc470;--okbg:#11321d;--warn:#e6b647;--warnbg:#2b2113;--info:#a9b7ff;--infobg:#1b2247}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--body);font:15.5px/1.65 system-ui,"Segoe UI",Arial,sans-serif}
+.shell{display:grid;grid-template-columns:250px minmax(0,1fr)}
+nav{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:22px 14px;background:var(--surface);border-right:1px solid var(--line)}
+nav a{display:block;padding:5px 10px;border-radius:6px;color:var(--body);text-decoration:none;font-size:13.5px}
+nav a:hover{background:var(--raised)}
+main{padding:36px clamp(16px,4vw,52px) 100px;max-width:980px;width:100%}
+h1,h2,h3{color:var(--ink);line-height:1.25}
+h2{margin-top:44px;padding-top:20px;border-top:1px solid var(--line)}
+a{color:var(--accent)}
+code{font:.86em Consolas,monospace;background:var(--raised);padding:.05em .35em;border-radius:4px;overflow-wrap:anywhere}
+li{margin:4px 0}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface);margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:8px 12px;border-bottom:1px solid var(--line)}
+th{background:var(--raised);color:var(--mute);font-size:12px;text-transform:uppercase}
+tr:last-child td{border-bottom:0}
+.c{text-align:center}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.ok{background:var(--okbg);color:var(--ok)}
+.info{background:var(--infobg);color:var(--info)}
+.warn{background:var(--warnbg);color:var(--warn)}
+.mute{background:var(--raised);color:var(--mute)}
+[id="14-open-questions"] + ol{background:var(--warnbg);color:var(--ink);border-radius:8px;padding:14px 18px 14px 40px}
+@media (max-width:860px){.shell{display:block}nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}}
+@media print{nav{display:none}.shell{display:block}}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav aria-label="Contents"><a href="#1-summary">1. Summary</a><a href="#2-decisions">2. Decisions</a><a href="#3-scope">3. Scope</a><a href="#4-architecture">4. Architecture</a><a href="#5-roles-and-permissions">5. Roles and permissions</a><a href="#6-catalog">6. Catalog</a><a href="#7-purchasing">7. Purchasing</a><a href="#8-selling">8. Selling</a><a href="#9-customer-credit-udhaar-next-release">9. Customer credit (udhaar), next release</a><a href="#10-data-model-first-release">10. Data model (first release)</a><a href="#11-core-rules">11. Core rules</a><a href="#12-build-phases">12. Build phases</a><a href="#13-differences-from-the-current-documents">13. Differences from the current documents</a><a href="#14-open-questions">14. Open questions</a></nav>
+<main>
+<h1>POS System: Proposed Plan</h1>
+<ul><li><b>Date:</b> 2026-11-27</li><li><b>Status:</b> proposal for review by Murslin and Hashim. Nothing is built yet.</li><li><b>Relation to the other documents:</b> <a href="ARCHITECTURE.md">ARCHITECTURE.md</a>, <a href="ROADMAP.md">ROADMAP.md</a> and <a href="pos-plan.html">pos-plan.html</a> are unchanged. Where this file differs from them, this file describes the change we propose. Section 13 lists the differences.</li></ul>
+<p><b>Labels:</b> <b>Decided</b> = chosen by Hashim, still needs Murslin's agreement. <b>Proposed</b> = default unless someone objects. <b>Open</b> = needs an answer.</p>
+<h2 id="1-summary">1. Summary</h2>
+<p>A point of sale and stock system that several shops can use (multi-tenant), where each shop can later have several branches. We build the backend first. The first release serves one shop with one branch: register products and vendors, receive stock with a GRN, sell for cash, close a shift and see sales reports.</p>
+<h2 id="2-decisions">2. Decisions</h2>
+<div class="tbl"><table><thead><tr><th>Topic</th><th>Choice</th><th>Label</th></tr></thead><tbody><tr><td>Backend and database</td><td>Laravel + PostgreSQL</td><td><span class="pill ok">Decided</span></td></tr><tr><td>Build order</td><td>Backend first</td><td><span class="pill ok">Decided</span></td></tr><tr><td>Frontend (after the backend)</td><td>Inertia + React</td><td><span class="pill ok">Decided</span></td></tr><tr><td>Tenancy</td><td>Multi-tenant, branches in the design from the start</td><td><span class="pill ok">Decided</span></td></tr><tr><td>First release scope</td><td>One shop, one branch</td><td><span class="pill ok">Decided</span></td></tr><tr><td>Languages</td><td>English, Roman Urdu, Urdu</td><td><span class="pill ok">Decided</span></td></tr><tr><td>Pack selling</td><td>Sell a full pack, part of a pack or a single piece, each with its own price</td><td><span class="pill ok">Decided</span></td></tr><tr><td>Catalog</td><td>Registered categories; every product has a code</td><td><span class="pill ok">Decided</span></td></tr><tr><td>Purchasing</td><td>Registered vendors; stock arrives through a GRN</td><td><span class="pill ok">Decided</span></td></tr><tr><td>Reports</td><td>Sales by day, week and month</td><td><span class="pill ok">Decided</span></td></tr><tr><td>Customer credit (udhaar)</td><td>Full credit and debit ledger</td><td><span class="pill ok">Decided</span></td></tr><tr><td>Owner portal</td><td>Separate portal on its own domain for us, the product owner</td><td><span class="pill ok">Decided</span></td></tr><tr><td>Tax</td><td>Not now; planned later</td><td><span class="pill ok">Decided</span></td></tr><tr><td>Zero-stock sales</td><td>Blocked</td><td><span class="pill ok">Decided</span></td></tr><tr><td>FBR integration</td><td>Later, together with tax</td><td><span class="pill info">Proposed</span></td></tr><tr><td>Stock costing</td><td>Weighted average cost</td><td><span class="pill info">Proposed</span></td></tr></tbody></table></div>
+<h2 id="3-scope">3. Scope</h2>
+<h3 id="first-release-mvp">First release (MVP)</h3>
+<ul><li>Shops, branches, users and roles</li><li>Categories, products, variants, pack sizes, barcodes</li><li>Vendors and GRN</li><li>Stock per branch with a stock ledger and manual adjustment</li><li>Shifts, cash in and cash out</li><li>Cash sales with line discounts, receipt numbers</li><li>Sales reports by day, week and month</li></ul>
+<h3 id="next-release">Next release</h3>
+<ul><li>Void and refund</li><li>Vendor return</li><li>Customer credit (udhaar)</li><li>Order-level discount</li><li>Other payment methods (card, bank transfer, wallet) and split payment</li><li>Owner portal</li></ul>
+<h3 id="later">Later</h3>
+<ul><li>Audit log screen and audit reports</li><li>Low-stock reminders</li><li>Urdu and Roman Urdu screens and receipts</li><li>Tax and FBR</li><li>Several branches per shop in daily use, stock transfer between branches</li><li>Purchase orders, expiry dates and batches</li></ul>
+<p>The first release still records who did each sensitive action and when. Only the audit screens wait.</p>
+<h2 id="4-architecture">4. Architecture</h2>
+<h3 id="multi-tenancy-and-branches-proposed-design">Multi-tenancy and branches (Proposed design)</h3>
+<ul><li>One application and one database. Every business table has <code>tenant_id</code>.</li><li>Stock, shifts, sales and GRNs also have <code>branch_id</code>.</li><li>A global query scope limits every query to the current tenant.</li><li>Unique rules are per tenant, for example product code and barcode.</li><li>Automated tests prove that one shop cannot read or change another shop's data.</li></ul>
+<h3 id="backend-first">Backend first</h3>
+<p>Business rules live in Action classes (for example <code>PostGoodsReceipt</code>, <code>CompleteSale</code>, <code>CloseShift</code>). Each phase is verified with feature tests against PostgreSQL and with seeded demo data. The React screens call the same Actions through thin controllers.</p>
+<h3 id="owner-portal">Owner portal</h3>
+<p>The portal records which shops use the product and what each one owes us. We enter payments by hand. It takes no online payment. It uses its own user table and login, separate from shop users. Locally it runs on a separate host name such as <code>owner.localhost</code>.</p>
+<h3 id="languages">Languages</h3>
+<p>All screen and receipt text goes through Laravel translation files from the first day (<code>en</code>, <code>ur-Latn</code>, <code>ur</code>). Products can store an Urdu name. Urdu also needs a right-to-left layout.</p>
+<h3 id="cost-risk">Cost risk</h3>
+<p>Development stays free and local. A multi-shop product with its own domain needs hosting and a domain before real clients can use it, and both usually cost money. This conflicts with the zero-budget rule and needs a decision before the first real client.</p>
+<h2 id="5-roles-and-permissions">5. Roles and permissions</h2>
+<div class="tbl"><table><thead><tr><th>Role</th><th>Scope</th><th>Release</th></tr></thead><tbody><tr><td>Platform owner (us)</td><td>Shops and their dues</td><td>Next (owner portal)</td></tr><tr><td>Shop owner</td><td>Everything in their own shop</td><td>MVP</td></tr><tr><td>Manager</td><td>Their branch: products, stock, GRN, reports</td><td>MVP</td></tr><tr><td>Cashier (any number)</td><td>Selling and their own shift</td><td>MVP</td></tr><tr><td>Stock keeper, accountant</td><td>Stock only, or reports only</td><td>Later</td></tr></tbody></table></div>
+<div class="tbl"><table><thead><tr><th>Action</th><th class="c">Cashier</th><th class="c">Manager</th><th class="c">Shop owner</th></tr></thead><tbody><tr><td>Make a sale, print a receipt</td><td class="c"><span class="pill ok">Yes</span></td><td class="c"><span class="pill ok">Yes</span></td><td class="c"><span class="pill ok">Yes</span></td></tr><tr><td>Open and close own shift</td><td class="c"><span class="pill ok">Yes</span></td><td class="c"><span class="pill ok">Yes</span></td><td class="c"><span class="pill ok">Yes</span></td></tr><tr><td>Discount up to the limit</td><td class="c"><span class="pill ok">Yes</span></td><td class="c"><span class="pill ok">Yes</span></td><td class="c"><span class="pill ok">Yes</span></td></tr><tr><td>Discount above the limit</td><td class="c"><span class="pill mute">No</span></td><td class="c"><span class="pill ok">Yes</span></td><td class="c"><span class="pill ok">Yes</span></td></tr><tr><td>Categories, products, prices, vendors</td><td class="c"><span class="pill mute">No</span></td><td class="c"><span class="pill ok">Yes</span></td><td class="c"><span class="pill ok">Yes</span></td></tr><tr><td>GRN and stock adjustment</td><td class="c"><span class="pill mute">No</span></td><td class="c"><span class="pill ok">Yes</span></td><td class="c"><span class="pill ok">Yes</span></td></tr><tr><td>View cost and profit</td><td class="c"><span class="pill mute">No</span></td><td class="c"><span class="pill ok">Yes</span></td><td class="c"><span class="pill ok">Yes</span></td></tr><tr><td>View reports</td><td class="c">Own shift</td><td class="c">Own branch</td><td class="c">All branches</td></tr><tr><td>Manage users and settings</td><td class="c"><span class="pill mute">No</span></td><td class="c"><span class="pill mute">No</span></td><td class="c"><span class="pill ok">Yes</span></td></tr><tr><td>Void and refund (next release)</td><td class="c"><span class="pill mute">No</span></td><td class="c"><span class="pill ok">Yes</span></td><td class="c"><span class="pill ok">Yes</span></td></tr></tbody></table></div>
+<p>Each cashier has their own login and shift. There is no public user registration. We create each new shop and its owner account (Proposed).</p>
+<h2 id="6-catalog">6. Catalog</h2>
+<ul><li><b>Category:</b> registered once, then selected on products. Sub-categories are optional.</li><li><b>Product:</b> a code that is unique within the shop (generated automatically, can be changed), name, optional Urdu name, category.</li><li><b>Variant:</b> the thing that is stocked. It has a base unit (piece, kg, litre). A simple product has one "Default" variant.</li><li><b>Pack size:</b> a way of selling a variant, with its own price and barcode.</li></ul>
+<p>Stock is always counted in the base unit.</p>
+<div class="tbl"><table><thead><tr><th>Sell as</th><th>Base quantity</th><th>Price (example)</th></tr></thead><tbody><tr><td>1 pencil</td><td>1</td><td>Rs 15</td></tr><tr><td>Half pack</td><td>12</td><td>Rs 170</td></tr><tr><td>Box</td><td>24</td><td>Rs 320</td></tr></tbody></table></div>
+<p>Selling one box from 100 pencils leaves 76 pencils.</p>
+<p>The base unit sits on the variant, so a 1 L bottle and a 5 L tin of oil are two variants counted in pieces. Loose oil is a variant counted in litres.</p>
+<h2 id="7-purchasing">7. Purchasing</h2>
+<h3 id="vendors">Vendors</h3>
+<p>Code, name, phone, address.</p>
+<h3 id="goods-received-note-grn">Goods Received Note (GRN)</h3>
+<ol><li>Select the vendor and branch.</li><li>Enter the vendor invoice number and date.</li><li>Add lines: product, pack size, quantity, cost.</li><li>Save as a draft and check it.</li><li>Post it.</li></ol>
+<p>Posting happens in one transaction: GRN number assigned, stock increased, stock ledger rows written, average cost updated. A posted GRN is never edited or deleted.</p>
+<h3 id="weighted-average-cost">Weighted average cost</h3>
+<div class="tbl"><table><thead><tr><th></th><th>Quantity</th><th>Cost per piece</th></tr></thead><tbody><tr><td>Existing stock</td><td>100</td><td>Rs 10.00</td></tr><tr><td>New GRN</td><td>48</td><td>Rs 12.00</td></tr><tr><td>Result</td><td>148</td><td>Rs 10.65</td></tr></tbody></table></div>
+<p>Average and unit costs are stored with four decimals. If existing stock is zero, the average becomes the new GRN cost.</p>
+<h2 id="8-selling">8. Selling</h2>
+<h3 id="shifts">Shifts</h3>
+<p>A cashier opens a shift with a cash count. Only one open shift per cashier. Every sale belongs to a shift. Cash taken out of or put into the drawer is recorded with a reason.</p>
+<p><b>Expected cash</b> = opening cash + cash sales + cash in − cash out. The next release adds cash refunds and udhaar collections.</p>
+<h3 id="checkout">Checkout</h3>
+<ol><li>The client sends pack IDs, quantities, discounts, payment and a unique request key.</li><li>The server finds the prices and calculates all totals itself.</li><li>In one transaction it locks the branch stock rows (always in the same order), checks stock, writes the sale, items, payment and stock ledger rows, and assigns the receipt number.</li><li>A repeat of the same request key returns the first receipt.</li></ol>
+<p>Lines for the same variant in different pack sizes are added together before the stock check.</p>
+<h3 id="sales-reports">Sales reports</h3>
+<p>By day, week and month: number of sales, total sales, discounts, per cashier and per branch, and gross profit for managers and owners. Dates follow the shop's time zone (Proposed: <code>Asia/Karachi</code>, week starts Monday).</p>
+<h2 id="9-customer-credit-udhaar-next-release">9. Customer credit (udhaar), next release</h2>
+<ul><li>A customer has a credit limit.</li><li>A ledger holds debit entries (credit sale) and credit entries (payment received).</li><li>Ledger entries are added, never edited. The balance is calculated from them.</li><li>A sale on credit above the limit needs a manager.</li></ul>
+<h2 id="10-data-model-first-release">10. Data model (first release)</h2>
+<p>Every table has <code>id</code> and timestamps. Business tables have <code>tenant_id</code>.</p>
+<div class="tbl"><table><thead><tr><th>Table</th><th>Main columns</th></tr></thead><tbody><tr><td>tenants</td><td>name, status</td></tr><tr><td>branches</td><td>name, address, timezone</td></tr><tr><td>users</td><td>name, email, password, role, branch_id, is_active</td></tr><tr><td>categories</td><td>name, parent_id</td></tr><tr><td>units</td><td>code, name, allows_decimal</td></tr><tr><td>products</td><td>code, name, name_ur, category_id, track_stock, is_active</td></tr><tr><td>product_variants</td><td>product_id, name, unit_id, reorder_level, is_active</td></tr><tr><td>variant_packs</td><td>variant_id, name, base_quantity, price_paisa, barcode, is_active</td></tr><tr><td>vendors</td><td>code, name, phone, address</td></tr><tr><td>goods_receipts</td><td>branch_id, grn_no, vendor_id, vendor_invoice_no, received_on, status, posted_by, posted_at</td></tr><tr><td>goods_receipt_items</td><td>goods_receipt_id, variant_id, variant_pack_id, quantity, base_quantity_per_pack, unit_cost, line_total_paisa</td></tr><tr><td>branch_stock</td><td>branch_id, variant_id, quantity, average_cost</td></tr><tr><td>stock_movements</td><td>branch_id, variant_id, type, quantity, reference, user_id, note</td></tr><tr><td>shifts</td><td>branch_id, user_id, opened_at, closed_at, opening_cash_paisa, expected_cash_paisa, counted_cash_paisa</td></tr><tr><td>cash_movements</td><td>shift_id, direction, amount_paisa, reason, user_id</td></tr><tr><td>sales</td><td>branch_id, shift_id, user_id, receipt_no, subtotal_paisa, discount_paisa, tax_paisa, rounding_paisa, total_paisa, idempotency_key</td></tr><tr><td>sale_items</td><td>sale_id, variant_id, variant_pack_id, product_name, variant_name, pack_name, base_quantity_per_pack, quantity, unit_price_paisa, unit_cost, discount_paisa, tax_paisa, line_total_paisa</td></tr><tr><td>payments</td><td>sale_id, method, amount_paisa, tendered_paisa, change_paisa</td></tr><tr><td>document_counters</td><td>branch_id, type, last_number</td></tr></tbody></table></div>
+<p><code>tax_paisa</code> stays zero until tax is built.</p>
+<h2 id="11-core-rules">11. Core rules</h2>
+<ol><li>Money is stored as whole paisa. Unit costs use four decimals. No floating-point numbers.</li><li>Quantities use exact decimals.</li><li>Posted sales and GRNs are never edited or deleted.</li><li>Sale lines keep copies of name, pack size, price and cost.</li><li>Every stock change has a stock ledger row, in the same transaction.</li><li>A sale or GRN is saved completely or not at all.</li><li>Receipt and GRN numbers come from a locked counter row per branch, so there are no gaps.</li><li>A request key stops double submission.</li><li>The server never trusts totals from the client.</li><li>Sensitive actions record who and when.</li><li>No secrets or real shop data in Git. The repository is public.</li></ol>
+<h2 id="12-build-phases">12. Build phases</h2>
+<div class="tbl"><table><thead><tr><th>Phase</th><th>Content</th><th>Done when</th></tr></thead><tbody><tr><td>0. Foundation</td><td>Laravel with the React starter kit, PostgreSQL, Pest, Pint, GitHub Actions with PostgreSQL</td><td>A fresh clone runs on both machines and CI is green</td></tr><tr><td>1. Shops and access</td><td>Tenants, branches, users, roles, policies</td><td>Tests prove tenant isolation and role limits</td></tr><tr><td>2. Catalog and vendors</td><td>Categories, units, products, variants, pack sizes, vendors</td><td>The pencil example can be registered</td></tr><tr><td>3. Stock and GRN</td><td>GRN, branch stock, ledger, adjustment, average cost</td><td>Posting a GRN updates stock and cost correctly</td></tr><tr><td>4. Shifts and checkout</td><td>Shifts, cash movements, sales, payments, receipt numbers</td><td>Tests prove totals, stock deduction, blocking and double-submit protection</td></tr><tr><td>5. Reports</td><td>Day, week, month</td><td>Report totals match the seeded sales</td></tr><tr><td>6. Screens</td><td>React screens for phases 1 to 5</td><td>A pretend shop day works from the browser, with database backup and restore tested</td></tr></tbody></table></div>
+<p>Dates are left out until we know the weekly hours of each person.</p>
+<h2 id="13-differences-from-the-current-documents">13. Differences from the current documents</h2>
+<ul><li>Multi-tenancy and branches replace the single-store design.</li><li>Inertia + React replaces the Vue proposal.</li><li>Backend is built before the screens.</li><li>Pack sizes are added. Price and barcode move from the variant to the pack size. Base unit moves from the product to the variant. The variant <code>sku</code> is replaced by the product code.</li><li>Vendors and GRN move into the first release.</li><li>Shifts move into the first release, because every sale belongs to a shift.</li><li>Tax moves out of the first release.</li><li><code>_cents</code> column names become <code>_paisa</code>.</li><li><code>stock_qty</code> moves to a per-branch stock table.</li><li>Added: cash movements, cost snapshot on sale lines, gap-free number counters, shop time zone.</li><li>Refunds, when built, record the shift and payment method, and cannot exceed the quantity sold.</li><li>Order discounts, when built, are split across lines in proportion, with the remainder on the last line.</li><li>Use the current Laravel starter kit instead of Breeze, and turn off public registration.</li><li>Suggested: protect <code>develop</code> as well as <code>main</code>.</li></ul>
+<h2 id="14-open-questions">14. Open questions</h2>
+<ol><li>The first release has no void and no vendor return. A wrong sale or GRN can only be handled with a stock adjustment, which does not correct sales totals or average cost. Is that acceptable, or do these two move into the first release?</li><li>Is udhaar fine in the next release, or is it needed in the first one?</li><li>Do we buy from vendors on credit? If yes, we also need a vendor ledger.</li><li>Do any products need expiry dates or batches?</li><li>Does the owner portal only record what shops owe us, with no online payment?</li><li>Do we create new shops ourselves, or can a shop register itself?</li><li>What kind of shop is the first target?</li></ol>
+</main>
+</div>
+</body>
+</html>
